@@ -1,0 +1,12 @@
+ul.accordion {
+	list-style-type: none;
+}
+
+.active .accordion-body {
+	height: auto;
+	list-style-type: none;
+}
+
+.dropdown-toggle:focus + .dropdown-menu {
+	display: block;
+}
