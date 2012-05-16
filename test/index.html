@@ -137,33 +137,33 @@ module( "Activable API" );
 test("A.activate()/A.deactivate()/A.toggle()", function() {
   var $target;
 
-  A.activate( ( $target = $("#test6>li:eq(0)") )[0] );
+  A( ( $target = $("#test6>li:eq(0)") )[0] ).activate();
   ok( $target.hasClass( "active" ), "an element that wasn't `.active` becomes `.active` with .activate()" );
 
-  A.deactivate( ( $target = $("#test6>li:eq(1)") )[0] );
+  A( ( $target = $("#test6>li:eq(1)") )[0] ).deactivate();
   ok( !$target.hasClass( "active" ), "an element that was `.active` is no more `.active` with .deactivate()" );
 
-  A.activate( ( $target = $("#test6>li:eq(0)") )[0] );
+  A( ( $target = $("#test6>li:eq(0)") )[0] ).activate();
   ok( $target.hasClass( "active" ), "an element that was `.active` is no more `.active` with .toggle()" );
 
-  A.deactivate( ( $target = $("#test6>li:eq(1)") )[0] );
+  A( ( $target = $("#test6>li:eq(1)") )[0] ).deactivate();
   ok( !$target.hasClass( "active" ), "an element that wasn't `.active` becomes `.active` with .toggle()" );
 });
 
 test("A.activate()/A.deactivate()/A.toggle() and tab behavior", function() {
   var $target;
 
-  A.activate( ( $target = $("#test7>li:eq(0)") )[0] );
+  A( ( $target = $("#test7>li:eq(0)") )[0] ).activate();
   ok( $target.hasClass( "active" ) && !$("#test7>li:eq(1)").hasClass("active"), "switch the active element" );
 
-  A.toggle( ( $target = $("#test7>li:eq(1)") )[0] );
+  A( ( $target = $("#test7>li:eq(1)") )[0] ).toggle();
   ok( $target.hasClass( "active" ) && !$("#test7>li:eq(0)").hasClass("active"), "switch the active element with toggle");
 });
 
 test("event listening", function() {
   expect(0);
 
-  A.on( $("#test8>li:eq(0)")[0], "activate", function(){  });
+  A( $("#test8>li:eq(0)")[0] ).on("activate", function(){  });
   $("#test8>li:eq(0)").Click();
 })
 

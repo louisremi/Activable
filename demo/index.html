@@ -11,7 +11,21 @@
 <body>
 	<div class="container" role="main">
 		<h1>Activable</h1>
-		<h2>lightweight foundation for modern UI components | 2K, IE8 compat.</h2>
+		<h2>lightweight foundation for modern UI components | 1.5K, IE8 compat.</h2>
+
+		<div class="row">
+			<div id="crsl" class="span12">
+				<ul class="activable carousel slide" data-group="crsl0">
+					<li class="item active"><img src="img/minsk0.jpg" />
+					<li class="item"><img src="img/minsk1.jpg" />
+					<li class="item"><img src="img/minsk2.jpg" />
+					<li class="item"><img src="img/minsk3.jpg" />
+					<li class="item"><img src="img/minsk4.jpg" />
+				</ul>
+				<a id="crslPrev" onclick="A('#crsl>ul').prev();">&lsaquo;</a>
+				<a id="crslNext" onclick="A('#crsl>ul').next();">&rsaquo;</a>
+			</div>
+		</div>
 
 		<div class="row">
 			<div class="span4">

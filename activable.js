@@ -13,21 +13,33 @@ var isStandard = "addEventListener" in window,
 // event delegater
 document[ _addEventListener ]( prefix + "click", activeHandler, false );
 
+function Activable( elem ) {
+	this[0] = typeof elem == "string" ? document.querySelector( elem ) : elem;
+}
+
 // Activable API
-Activable = {
-	activate: function( elem ) {
-		activeHandler({ target: elem, type: "add" });
+Activable.prototype = {
+	activate: function( index ) {
+		index ?
+			seek( this[0], undefined, index ) :
+			activeHandler({ target: this[0], type: "add" });
+	},
+	deactivate: function() {
+		activeHandler({ target: this[0], type: "remove" });
 	},
 
-	deactivate: function( elem ) {
-		activeHandler({ target: elem, type: "remove" });
+	next: function() {
+		seek( this[0], "n" );
+	},
+	prev: function() {
+		seek( this[0], "p" );
 	},
 
-	on: function( elem, type, handler ) {
-		var uuid = elem.getAttribute( "data-aid" );
+	on: function( type, handler ) {
+		var uuid = this[0].getAttribute( "data-aid" );
 
 		if ( !uuid ) {
-			elem.setAttribute( "data-aid", uuid = "act" + ( Math.random() * 1E9 |0 ) );
+			this[0].setAttribute( "data-aid", uuid = "act" + ( Math.random() * 1E9 |0 ) );
 		}
 
 		if ( type == "activate" || type == "both" ) {
@@ -37,26 +49,27 @@ Activable = {
 			( deactivateHandlers[ uuid ] = deactivateHandlers[ uuid ] || [] ).push( handler );
 		}
 	},
-
-	off: function( elem, type, handler ) {
-		var uuid = elem.getAttribute( "data-aid" );
+	off: function( type, handler ) {
+		var uuid = this[0].getAttribute( "data-aid" );
 
 		off( uuid, type, handler, activateHandlers, "activate" );
 		off( uuid, type, handler, deactivateHandlers, "deactivate" );
 	},
 
-	toggle: function( elem, activateHandler, deactivateHandler ) {
+	toggle: function( activateHandler, deactivateHandler ) {
 		if ( activateHandler && deactivateHandler ) {
-			Activable.on( elem, "activate", activateHandler );
-			Activable.on( elem, "deactivate", deactivateHandler );
+			Activable.on( this[0], "activate", activateHandler );
+			Activable.on( this[0], "deactivate", deactivateHandler );
 
 		} else {
-			activeHandler({ target: elem, type: "toggle" });
+			activeHandler({ target: this[0], type: "toggle" });
 		}
 	}
 };
 
-window.A = Activable;
+window.A = function( elem ) {
+	return new Activable( elem );
+};
 
 function activeHandler( event ) {
 	event = event || window.event;
@@ -82,7 +95,7 @@ function activeHandler( event ) {
 	if ( !isActivable ) { return; }
 
 	// if the element is an ul, delegation is being used;
-	if ( target.nodeName == "UL" ) {
+	if ( target.nodeName == "UL" && descendants[1] ) {
 		delegater = target;
 		target = descendants[1];
 		descendants.shift();
@@ -106,15 +119,12 @@ function activeHandler( event ) {
 	// search for an active element in the same group
 	if ( ( group = ( delegater || target ).getAttribute( "data-group" ) ) ) {
 		if ( delegater ) {
-			children = delegater.children;
-			i = children.length;
-
-			while ( i-- ) {
-				if ( children[i].nodeType == 1 && c( children[i], "has", "active" ) ) {
-					previouslyActive = children[i];
-					break;
+			eachChild( delegater, function(el) {
+				if ( c( el, "has", "active" ) ) {
+					previouslyActive = el;
+					return false;
 				}
-			}
+			});
 
 		} else {
 			previouslyActive = document.querySelector( ".active[data-group=" + group + "]" );
@@ -202,7 +212,68 @@ function make( targets, verb, event ) {
 	c( targets[0], verb, "active" );
 }
 
+function eachChild( elem, callback ) {
+	var children = elem.children,
+		i = -1,
+		length = children.length;
+
+	while ( ++i < length ) {
+		if ( children[i].nodeType == 1 ) {
+			if ( callback( children[i] ) === false ) {
+				break;
+			}
+		}
+	}
+}
+
+function seek( elem, rel, index ) {
+	var i = 0,
+		prevChild,
+		isActive;
+
+	eachChild( elem, function(el) {
+		isActive = c( el, "has", "active" );
+
+		// using .activate( <index> )
+		if ( index ) {
+			if ( i == index ) {
+				// activate target
+				activeHandler({ target: el, type: "add" });
+			} else if ( isActive ) {
+				// deactivate previously active one
+				activeHandler({ target: el, type: "remove" });
+			}
+
+			c( el, i < index ? "add" : "remove", "before-active" );
+
+		// using .prev()
+		} else if ( rel == "p" ) {
+			if ( isActive && prevChild ) {
+				c( prevChild, "remove", "before-active" );
+				activeHandler({ target: prevChild, type: "add" });
+				activeHandler({ target: el, type: "remove" });
+				return false;
+			}
+			prevChild = el;
+
+		// using .next()
+		} else {
+			if ( prevChild ) {
+				activeHandler({ target: el, type: "add" });
+				activeHandler({ target: prevChild, type: "remove" });
+				c( prevChild, "add", "before-active" );
+				return false;
+			}
+			if ( isActive ) {
+				prevChild = el;
+			}
+		}
+
+		i++;
+	});
+}
+
 // c, an expressive className manipulation library
-function c(e,v,n,c,r){r=e[c='className'].replace(RegExp(' *\\b'+n+'\\b','g'),'');return'has'==v?r!=e[c]:e[c]={add:1,toggle:r==e[c]}[v]?r+' '+n:r};
+function c(e,v,n,c,r){r=e[c='className'].replace(RegExp('(^| ) *'+n+' *( |$)','g'),'');return'has'==v?r!=e[c]:e[c]={add:1,toggle:r==e[c]}[v]?r+' '+n:r};
 
 })(window,document,Math);
