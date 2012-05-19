@@ -67,12 +67,12 @@ Activable.prototype = {
 	}
 };
 
-window.A = function( elem ) {
+window.Activable = window.A = function( elem ) {
 	return new Activable( elem );
 };
 
 function activeHandler( event ) {
-	event = event || window.event;
+	!event && ( event = window.event );
 	var target = event.target || event.srcElement,
 		descendants = [target],
 		isActivable,
@@ -137,12 +137,12 @@ function activeHandler( event ) {
 
 		// deactivate the active element of the same group
 		if ( previouslyActive ) {
-			make( [ previouslyActive, delegater, findInternalTarget( findActivationAnchor( previouslyActive ) || previouslyActive ) ], "remove", event );
+			make( [ previouslyActive, findInternalTarget( findActivationAnchor( previouslyActive ) || previouslyActive ) ], "remove", event );
 		}
 	}
 
 	// activate or deactivate the target and the internal target
-	make( [ target, delegater, findInternalTarget( activationAnchor || target ) ], verb, event );
+	make( [ target, findInternalTarget( activationAnchor || target ) ], verb, event );
 
 	preventDefault( event );
 	return false;
@@ -194,22 +194,27 @@ function off( uuid, type, handler, allHandlers, match ) {
 }
 
 function make( targets, verb, event ) {
-	var uuid, handlers, i;
+	var uuid, handlers, i, target = targets[0];
 
-	if ( targets[2] ) {
-		c( targets[2], verb, "active" );
+	if ( targets[1] ) {
+		c( targets[1], verb, "active" );
 	}
+	c( target, verb, "active" );
 
-	if ( ( uuid = ( targets[1] || targets[0] ).getAttribute( "data-aid" ) ) ) {
-		handlers = ( verb == "add" ? activateHandlers : deactivateHandlers )[ uuid ] || [];
-		i = handlers.length;
+	// bubble the event up in the tree
+	while ( target && target.ownerDocument ) {
+		if ( ( uuid = target.getAttribute( "data-aid" ) ) ) {
+			handlers = ( verb == "add" ? activateHandlers : deactivateHandlers )[ uuid ] || [];
+			i = handlers.length;
 
-		while ( i-- ) {
-			handlers[i].call( targets[0], event, targets[2] );
+			while ( i-- ) {
+				if ( !handlers[i].call( targets[0], event, targets[1] ) ) {
+					return;
+				}
+			}
 		}
+		target = target.parentNode;
 	}
-
-	c( targets[0], verb, "active" );
 }
 
 function eachChild( elem, callback ) {
