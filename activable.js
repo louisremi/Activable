@@ -8,7 +8,31 @@ var isStandard = "addEventListener" in window,
 	prefix = isStandard ? "" : "on",
 	Activable,
 	activateHandlers = {},
-	deactivateHandlers = {};
+	deactivateHandlers = {},
+	rauto = /(?:^| )auto(\w*)-onactivate(?: |$)/,
+	_ransition = "ransition",
+	html = document.documentElement,
+	prefx,
+	prefixes = {
+		"WebkitT": "webkitTransitionEnd",
+		"MozT": "transitionend",
+		"msT": "MSTransitionEnd",
+		// Opera has the strangest behavior
+		//"OT": "oTransitionEnd",
+		"t": "transitionend"
+	},
+	transition,
+	transitionend;
+
+// transition feature detection
+for ( prefx in prefixes ) {
+	if ( ( transition = prefx + _ransition ) in html.style ) {
+		transitionend = prefixes[ prefx ];
+		break;
+	}
+	transition = undefined;
+}
+transition && document[ _addEventListener ]( transitionend, transitionendHandler, false );
 
 // event delegater
 document[ _addEventListener ]( prefix + "click", activeHandler, false );
@@ -137,15 +161,15 @@ function activeHandler( event ) {
 
 		// deactivate the active element of the same group
 		if ( previouslyActive ) {
-			make( [ previouslyActive, findInternalTarget( findActivationAnchor( previouslyActive ) || previouslyActive ) ], "remove", event );
+			make( [ previouslyActive, delegater, findInternalTarget( findActivationAnchor( previouslyActive ) || previouslyActive ) ], "remove", event );
 		}
 	}
 
 	// activate or deactivate the target and the internal target
-	make( [ target, findInternalTarget( activationAnchor || target ) ], verb, event );
+	make( [ target, delegater, findInternalTarget( activationAnchor || target ) ], verb, event );
 
 	preventDefault( event );
-	return false;
+	//return false;
 
 }
 
@@ -194,12 +218,21 @@ function off( uuid, type, handler, allHandlers, match ) {
 }
 
 function make( targets, verb, event ) {
-	var uuid, handlers, i, target = targets[0];
+	var target = targets[0],
+		uuid, handlers, i, matches;
 
-	if ( targets[1] ) {
-		c( targets[1], verb, "active" );
+	if ( transition && ( matches = rauto.exec( ( targets[1] || target ).className ) ) ) {
+		if ( targets[2] ) {
+			autoDim( targets[2], matches[1], verb );
+		}
+		autoDim( target, matches[1], verb );
+
+	} else {
+		if ( targets[2] ) {
+			c( targets[2], verb, "active" );
+		}
+		c( target, verb, "active" );
 	}
-	c( target, verb, "active" );
 
 	// bubble the event up in the tree
 	while ( target && target.ownerDocument ) {
@@ -208,7 +241,7 @@ function make( targets, verb, event ) {
 			i = handlers.length;
 
 			while ( i-- ) {
-				if ( !handlers[i].call( targets[0], event, targets[1] ) ) {
+				if ( !handlers[i].call( targets[0], event, verb == "add" ? "activate" : "deactivate", targets[2] ) ) {
 					return;
 				}
 			}
@@ -276,6 +309,52 @@ function seek( elem, rel, index ) {
 
 		i++;
 	});
+}
+
+function autoDim( elem, dimension, verb ) {
+	var from, to;
+
+	from = getComputedStyle( elem, dimension );
+	// transitions should be temporarily disabled for Chrome
+	elem.style[ transition ] = "none";
+	c( elem, verb, "active" );
+	// make sure the inline style is empty (not the case during a transition)
+	elem.style[ dimension ] = "";
+	to = getComputedStyle( elem, dimension );
+	elem.style[ dimension ] = from;
+	// computed value has to be accessed to make sure the browser took it into account
+	getComputedStyle( elem, dimension );
+	elem.style[ transition ] = "";
+	elem.style[ dimension ] = to;
+}
+
+// remove inline style on transition end
+function transitionendHandler( event ) {
+	var target = event.target,
+		matches, child, lastTest;
+
+	while ( target && target != document && !( matches = rauto.exec( target.className ) ) && !lastTest ) {
+		child = target,
+		target = target.parentNode;
+		lastTest = true;
+	}
+
+	if ( !matches || matches[1] != event.propertyName ) { return; }
+
+	// delegation is being used
+	target.nodeName == "UL" && ( target = child );
+
+	// Chrome is having this bug again
+	target.style[ transition ] = "none";
+	// This line is enough to get the job done in Firefox
+	target.style[ matches[1] ] = "";
+	// the following 2 lines are part of workaround for Chrome as well
+	getComputedStyle( target, transition );
+	target.style[ transition ] = "";
+}
+
+function getComputedStyle( elem, prop ) {
+	return window.getComputedStyle( elem )[ prop ];
 }
 
 // c, an expressive className manipulation library

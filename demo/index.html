@@ -28,7 +28,7 @@
 		</div>
 
 		<div class="row">
-			<div class="span4">
+			<div class="span6">
 			    <ul class="nav nav-tabs activable" data-group="navtab0">
 				    <li class="active"><a href="#tab1">Tab1</a></li>
 				    <li class=""><a href="#tab2">Tab2</a></li>
@@ -50,7 +50,7 @@
 				</div>
 			</div>
 
-			<div class="span4">
+			<div class="span6">
 				<ul class="accordion activable" data-group="-acc0">
 					<li class="accordion-group active">
 						<a class="accordion-heading"><span class="accordion-toggle">Collapsible Group Item #1</span></a>
@@ -81,20 +81,153 @@
 					</li>
 				</ul>
 			</div>
+		</div>
 
-			<div class="span4">
-				<div><ul class="btn-group activable" data-toggle="buttons-checkbox">
-					<li class="btn btn-primary">Left
-					<li class="btn btn-primary">Middle
-					<li class="btn btn-primary">Right
-	            </ul></div>
+		<div class="row" style="height: 300px;">
+			<div class="span6">
+				<div class="inline-children">
+					<ul class="btn-group activable" data-toggle="buttons-checkbox">
+						<li class="btn btn-primary">Left
+						<li class="btn btn-primary">Middle
+						<li class="btn btn-primary">Right
+		            </ul>
 
-	            <div><ul class="btn-group activable" data-toggle="buttons-checkbox" data-group="-btns1">
-					<li class="btn btn-primary">Left
-					<li class="btn btn-primary">Middle
-					<li class="btn btn-primary">Right
-	            </ul></div>
+		            <p>0 or more active buttons</p>
+		        </div>
+
+		        <div class="inline-children">
+		            <ul class="btn-group activable" data-toggle="buttons-checkbox" data-group="-btns1">
+						<li class="btn btn-primary">Left
+						<li class="btn btn-primary">Middle
+						<li class="btn btn-primary">Right
+		            </ul>
+
+		            <p>0 or 1 active button</p>
+		        </div>
+
+		        <div class="inline-children">
+		            <ul class="btn-group activable" data-toggle="buttons-checkbox" data-group="btns2">
+						<li class="btn btn-primary active">Left
+						<li class="btn btn-primary">Middle
+						<li class="btn btn-primary">Right
+		            </ul>
+
+		            <p>Always 1 active button</p>
+				</div>
 			</div>
+
+			<div class="span6">
+				<ul class="tree-list activable autoheight-onactivate" data-group="-tree">
+					<li>
+						<a>item 1</a>
+						<ul class="activable autoheight-onactivate" data-group="-tree1">
+							<li>
+								<a>sub-item 1-1</a>
+								<ul class="activable">
+									<li>
+										<a>sub-sub-item 1-1-1</a>
+									</li>
+									<li>
+										<a>sub-sub-item 1-1-2</a>
+									</li>
+									<li>
+										<a>sub-sub-item 1-1-3</a>
+									</li>
+									<li>
+										<a>sub-sub-item 1-1-4</a>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<a>sub-item 1-2</a>
+								<ul class="activable">
+									<li>
+										<a>sub-sub-item 1-2-1</a>
+									</li>
+									<li>
+										<a>sub-sub-item 1-2-2</a>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+					<li>
+						<a>item 2</a>
+						<ul class="activable autoheight-onactivate" data-group="-tree2">
+							<li>
+								<a>sub-item 2-1</a>
+								<ul class="activable">
+									<li>
+										<a>sub-sub-item 2-1-1</a>
+									</li>
+									<li>
+										<a>sub-sub-item 2-1-2</a>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<a>sub-item 2-2</a>
+								<ul class="activable">
+									<li>
+										<a>sub-sub-item 2-2-1</a>
+									</li>
+									<li>
+										<a>sub-sub-item 2-2-2</a>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<a>sub-item 2-3</a>
+								<ul class="activable">
+									<li>
+										<a>sub-sub-item 2-3-1</a>
+									</li>
+									<li>
+										<a>sub-sub-item 2-3-2</a>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<a>sub-item 2-4</a>
+								<ul class="activable">
+									<li>
+										<a>sub-sub-item 2-4-1</a>
+									</li>
+									<li>
+										<a>sub-sub-item 2-4-2</a>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+					<li>
+						<a>item 3</a>
+					</li>
+					<li>
+						<a>item 4</a>
+						<ul class="activable autoheight-onactivate" data-group="-tree4">
+							<li>
+								<a>sub-item 4-1</a>
+								<ul class="activable">
+									<li>
+										<a>sub-sub-item 4-1-1</a>
+									</li>
+									<li>
+										<a>sub-sub-item 4-1-2</a>
+									</li>
+									<li>
+										<a>sub-sub-item 4-1-3</a>
+									</li>
+									<li>
+										<a>sub-sub-item 4-1-4</a>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
 
 			<!-- This works great, but shouldn't be part of this demo
 			<div class="span4 navbar navbar-static"><div class="navbar-inner">
