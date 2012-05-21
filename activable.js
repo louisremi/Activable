@@ -111,12 +111,18 @@ function activeHandler( event ) {
 		verb;
 
 	// search for activable parent
-	while ( target && target.ownerDocument && !( isActivable = c( target, "has", "activable" ) ) ) {
+	while ( target && target.ownerDocument && ( isActivable = target.getAttribute("data-activable") ) == undefined ) {
 		descendants.unshift( target = target.parentNode );
 	}
 
-	// ignore clicks occuring outside of activable targets
-	if ( !isActivable ) { return; }
+	// stop here if the last target is not activable
+	if ( isActivable == undefined ) {
+		return;
+	}
+	// default behavior is "1 and always 1 is active"
+	if ( isActivable == "" ) {
+		isActivable = "1"
+	}
 
 	// if the element is an ul, delegation is being used;
 	if ( target.nodeName == "UL" && descendants[1] ) {
@@ -140,8 +146,9 @@ function activeHandler( event ) {
 		event.type
 	);
 
-	// search for an active element in the same group
-	if ( ( group = ( delegater || target ).getAttribute( "data-group" ) ) ) {
+	// unless the behavior is "O or X are active", deactivate the current active element
+	if ( isActivable != "0X" ) {
+		// if delegation is used, search for an active element with the same parent
 		if ( delegater ) {
 			eachChild( delegater, function(el) {
 				if ( c( el, "has", "active" ) ) {
@@ -150,16 +157,17 @@ function activeHandler( event ) {
 				}
 			});
 
-		} else {
+		// search for an active element in the same group
+		} else if ( ( group = ( target ).getAttribute( "data-group" ) ) ) {
 			previouslyActive = document.querySelector( ".active[data-group=" + group + "]" );
 		}
 
-		// make sure one element is always active, unless group starts with -
-		if ( !/^-/.test( group ) && target == previouslyActive ) { 
-			return preventDefault( event ); 
+		// if "1 and always 1 is active", check the target is not the same as the previously active
+		if ( isActivable == "1" && target == previouslyActive ) {
+			return preventDefault( event );
 		}
 
-		// deactivate the active element of the same group
+		// deactivate the previously active element
 		if ( previouslyActive ) {
 			make( [ previouslyActive, delegater, findInternalTarget( findActivationAnchor( previouslyActive ) || previouslyActive ) ], "remove", event );
 		}
@@ -169,8 +177,6 @@ function activeHandler( event ) {
 	make( [ target, delegater, findInternalTarget( activationAnchor || target ) ], verb, event );
 
 	preventDefault( event );
-	//return false;
-
 }
 
 function findActivationAnchor( elem, firstElemChild ) {
