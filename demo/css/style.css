@@ -94,6 +94,11 @@
 }
 
 .tree-list li > a:before {
+	content: "  ";
+	margin: 0 5px;
+}
+
+.tree-list li.expandable > a:before {
 	/* for some reason the pseudo-element isn't transformed with inline display */
 	display: inline-block;
 	content: "▸";
