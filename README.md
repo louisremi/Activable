@@ -4,7 +4,7 @@ Activable
 foundations for click-based UI components | 2K, IE8 compat.
 -----------------------------------------------------------
 
-Activable helps you build modern UI components quicker and keeps your code clean. Here is all the code needed to create a tab component:
+Activable helps you build modern UI components quicker and keep your code clean. Here is all the code needed to create a tab component:
 
 ```html
 <script src="activable.js"></script>
@@ -20,7 +20,7 @@ Activable helps you build modern UI components quicker and keeps your code clean
 </div>
 ```
 
-Some CSS will also be required (Twitter Bootsrap is a good fit) but *no custom JS*. Activable can be used to create common click-based UI components in a declarative way, as illustrated in the *[demo](http://louisremi.github.com/Activable/demo/)*.
+Some CSS will also be required (Twitter Bootsrap is a good fit) but **no custom JS**. Activable can be used to create common click-based UI components in a declarative way, as illustrated in the *[demo](http://louisremi.github.com/Activable/demo/)*.
 
 Declarative conventions
 =======================
