@@ -110,7 +110,7 @@ function activeHandler( event ) {
 		isActive,
 		verb;
 
-	// search for activable parent
+	// search for an activable parent
 	while ( target && target.ownerDocument && ( isActivable = target.getAttribute("data-activable") ) == undefined ) {
 		descendants.unshift( target = target.parentNode );
 	}
@@ -131,6 +131,7 @@ function activeHandler( event ) {
 		descendants.shift();
 	}
 
+	// search for an activation anchor
 	activationAnchor = findActivationAnchor( target );
 	isActive = c( target, "has", "active" );
 
@@ -180,15 +181,12 @@ function activeHandler( event ) {
 }
 
 function findActivationAnchor( elem, firstElemChild ) {
-	firstElemChild = elem.children[0];
-	// naughty IE8 includes comments in children
-	while ( firstElemChild && firstElemChild.nodeType != 1 ) {
-		firstElemChild = firstElemChild.nextSibling;
-	}
+	eachChild( elem, function(el) {
+		firstElemChild = el;
+		return false;
+	});
 
-	return firstElemChild && firstElemChild.nodeName == "A" ?
-		firstElemChild :
-		undefined;
+	return firstElemChild && firstElemChild.nodeName == "A" && firstElemChild;
 }
 
 function findInternalTarget( elem, internalTarget ) {
