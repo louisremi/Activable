@@ -10,10 +10,23 @@
 </head>
 <body>
 	<div class="container" role="main">
-		<h1>Activable</h1>
-		<h2>foundations for click-based UI components | 2K, IE8 compat.</h2>
+		<div class="page-header">
+			<h1>Activable</h1>
+			<h2>Declarative UI components <small>— 2K, 0 dependency, IE8 compatible</small></h2>
+		</div>
 
-		<div class="row">
+		<div id="act-nav-bg"></div>
+		<ul id="act-nav" class="nav nav-pills">
+			<li id="act-nav-demo" class="active">
+				<a href="#demo"><i class="icon-play icon-white"></i> Demo</a>
+			<li  id="act-nav-src" class="">
+				<a href="view-source:http://louisremi.github.com/Activable/demo/"><i class="icon-eye-open icon-white"></i> View Source</a>
+			<li id="act-nav-docs" class=""><a href="http://louisremi.github.com/Activable/docs/">Documentation</a>
+			<li id="act-nav-fork" class=""><a href="http://github.com/louisremi/Activable">Fork on Github</a>
+			<li id="act-nav-get" class=""><a href="http://github.com/louisremi/Activable/downloads">Download</a>
+		</ul>
+
+		<div id="demo" class="row">
 			<div id="crsl" class="span12">
 				<ul class="carousel slide" data-activable>
 					<li class="item active"><img src="img/minsk0.jpg" />
