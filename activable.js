@@ -190,9 +190,9 @@ function findActivationAnchor( elem, firstElemChild ) {
 }
 
 function findInternalTarget( elem, internalTarget ) {
-	return ( internalTarget = elem.getAttribute( "href" ) ) && /^#./.test( internalTarget ) ?
-		document.querySelector( internalTarget ) :
-		undefined;
+	return ( internalTarget = elem.getAttribute( "href" ) ) &&
+		/^#./.test( internalTarget ) &&
+		document.querySelector( internalTarget );
 }
 
 function preventDefault( event ) {
