@@ -30,7 +30,7 @@ Activable can be used to create common click-based UI components, as illustrated
 Documentation
 =============
 
-The declarative markup used to create activable components and the JS API used to extend them have a *zero to hero* **[documentation](http://louisremi.github.com/Activable/demo/)**.
+The declarative markup used to create activable components and the JS API used to extend them have a *zero to hero* **[documentation](http://louisremi.github.com/Activable/docs/)**.
 
 License
 =======
