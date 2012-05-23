@@ -1,0 +1,245 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>Activable</title>
+
+	<link rel="stylesheet" type="text/css" href="../demo/css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="../demo/css/style.css" />
+</head>
+<body>
+	<div class="container" role="main">
+		<div class="page-header">
+			<h1>Activable</h1>
+			<h2>Declarative UI components <small>— 2K, 0 dependency, IE8 compatible</small></h2>
+		</div>
+
+		<div id="act-nav-bg"></div>
+		<ul id="act-nav" class="nav nav-pills">
+			<li id="act-nav-intro">
+				<a href="https://github.com/louisremi/Activable#activable"><i class="icon-home icon-white"></i> Intro</a>
+			<li id="act-nav-demo">
+				<a href="http://louisremi.github.com/Activable/demo/"><i class="icon-play icon-white"></i> Demo</a>
+			<li  id="act-nav-src">
+				<a href="view-source:http://louisremi.github.com/Activable/demo/"><i class="icon-eye-open icon-white"></i> View Source</a>
+			<li id="act-nav-docs" class="active"><a href="#docs"><i class="icon-file icon-white"></i> Documentation</a>
+			<li id="act-nav-fork"><a href="http://github.com/louisremi/Activable"><i class="icon-share-alt icon-white"></i> Fork on Github</a>
+			<li id="act-nav-get"><a href="http://github.com/louisremi/Activable/downloads"><i class="icon-download-alt icon-white"></i> Download</a>
+		</ul>
+
+		<div id="docs" class="row">
+			<nav class="span4">
+				<ol class="nav nav-list">
+					<li>
+						<a href="#declarative-conventions">Declarative conventions</a>
+						<ol class="nav nav-list">
+							<li><a href="#the-basics">The Basics</a></li>
+							<li><a href="#activable-lists">Activable Lists</a></li>
+							<li><a href="#activation-anchors">Activation Anchors</a></li>
+							<li><a href="#activation-anchors">Internal Relations</a></li>
+						</ol>
+					</li>
+					<li>
+						<a href="#js-api">JS API</a>
+						<ol class="nav nav-list">
+							<li><a href="#js-basics">Basic Methods<br/> <code>Activable()</code> <code>A()</code></a></li>
+							<li><a href="#events">Event listeners<br/> <code>.on()</code> <code>.toggle()</code> <code>.off()</code></a></li>
+							<li><a href="#direct-modifiers">Direct Modifiers<br/> <code>.activate()</code> <code>.deactivate()</code> <code>.toggle()</code></a></li>
+							<li><a href="#iterative-modifiers">Iterative Modifiers<br/> <code>.next()</code> <code>.prev()</code> <code>.activate()</code></a></li>
+						</ol>
+					</li>
+				</ol>
+			</nav>
+
+			<div id="crsl" class="span8 offset4">
+				<div id="declarative-conventions" class="row">
+					<div class="span8">
+						<h2>Declarative Conventions</h2>
+					</div>
+				</div>
+
+				<div id="the-basics" class="row">
+					<div class="span8">
+						<h3>The Basics</h3>
+
+						<p>
+							The conventional markup is composed of the `data-activable` and `data-group` attributes, as well as the `active` class:
+						</p>
+
+						<ul>
+							<li><b><code>@data-activable</code></b> is used to indicate that an element should become <code>.active</code> when clicked. The value of this attribute indicates the exact behavior of the component:
+								<ul>
+									<li><b><code>"1" </code></b> stands for "<b>1 and always 1 is active</b>" and means that when one element is <code>.active</code> the other elements of the same group lose this class (default value).
+									<li><b><code>"01"</code></b> stands for "<b>0 or 1 is active</b>" and has the same behavior as `"1"`, but the state of an element can be toggled.
+									<li><b><code>"0X"</code></b> stands for "<b>0 or X are active</b>" and means that state changes don't affect the elements of the same group.
+								</ul>
+							<li><b><code>@data-group</code></b> can be used to indicate which group (or component instance) this element is part of: every element sharing the same value for this attribute will be part of the same group.
+							<li><b><code>.active</code></b> should be targeted in CSS to render the elements of an activable components according to their state.
+						</ul>
+
+						<iframe style="width: 100%; height: 280px;" src="http://jsfiddle.net/utFNt/2/embedded/html,result,css" frameborder="0"></iframe>
+					</div>
+				</div>
+
+				<div id="activable-lists" class="row">
+					<div class="span8">
+						<h3>Activable Lists</h3>
+
+						<p>
+							To reduce the noise in the markup, activable lists can be used: all children items of an <b><code>&lt;ul&nbsp;data-activable&gt;</code></b> will be considered activable, in the same group, with the same behavior. The <code>&lt;ul&gt;</code> itself will not be activable. 
+						</p>
+
+						<iframe style="width: 100%; height: 280px;" src="http://jsfiddle.net/HVgva/3/embedded/html,result,css" frameborder="0"></iframe>
+					</div>
+				</div>
+
+				<div id="activation-anchors" class="row">
+					<div class="span8">
+						<h3>Activation Anchors</h3>
+
+						<p>
+							By default, clicking anywhere inside an activable element activates or toggles the active state of this element. The "click sensitive" area of an activable element can be restricted using activation anchors: if the first child of an activable element is an <b><code>&lt;a&gt;</code></b>, the element will change state only when this anchor is clicked.
+						</p>
+
+						<iframe style="width: 100%; height: 280px;" src="http://jsfiddle.net/XaXEB/3/embedded/html,result,css" frameborder="0"></iframe>
+					</div>
+				</div>
+
+				<div id="internal-relations" class="row">
+					<div class="span8">
+						<h3>Internal Relations</h3>
+
+						<p>
+							Another common pattern is to have the state of an element be reflected on another one. This is the case of tab components: the labels are in an activable list and the content is in a different wrapper, but as a label is clicked, the label itself and the associated content become active. This relation can be expressed by an internal link if either the activable element is an anchor or if it has an <a href="#activation-anchors">activation anchor</a>.
+						</p>
+
+						<iframe style="width: 100%; height: 300px;" src="http://jsfiddle.net/gNVft/7/embedded/html,result,css" frameborder="0"></iframe>
+					</div>
+				</div>
+
+				<div id="js-api" class="row">
+					<div class="span8">
+						<h2>JS API</h2>
+					</div>
+				</div>
+
+				<div id="js-basics" class="row">
+					<div class="span8">
+						<h3>Basic Methods</h3>
+
+						<dl>
+							<dt><code>Activable( selector )</code> &amp; <code>A()</code> alias</dt>
+							<dd>
+								<p>
+									The JS API of Activable is similar to jQuery's one: all methods of the API are executed on a DOM element previously retrieved by passing a CSS selector to the basic <code>Activable()</code> or <code>A()</code> methods. It's also possible to pass a DOM element instead of the selector.
+								</p>
+								<p>
+									Since Activable only aims for compatibility with IE8 and better browsers, it assumes that <code>document.querySelector()</code> is available and these basic methods are just shorthands for querying the DOM from the document root.
+								</p>
+								<p>
+									<em>Notable differences with jQuery's API</em>:
+								</p>
+								<ul>
+									<li>the basic methods don't search for all elements matching the selector but only the first one,
+									<li>the methods of the API are not chainable,
+									<li>to maintain compatibility with IE8, only CSS2.1 selectors should be used, and jQuery specific selectors such as <code>:first, :last or :eq()</code> should never be used. There is a helpful list of CSS2.1 (IE8 and better browsers) and CSS3 (IE9 and better browsers) selectors available on <a href="http://www.quirksmode.org/css/contents.html">quircksmode</a>.
+								</ul>
+							</dd>
+						</dl>
+					</div>
+				</div>
+
+				<div id="js-basics" class="row">
+					<div class="span8">
+						<h3>Event Listeners</h3>
+
+						<dl>
+							<dt><code>.on( type, callback )</code></dt>
+							<dd>
+								<p>
+									This method adds, on any DOM element, an event listener that will execute the <code>callback</code> when an internal event fires. The two <code>type</code>s of internal events are <code>"activate"</code> and <code>"deactivate"</code>, they fire after an activable elements changed state and bubble up in the DOM tree.
+								</p>
+								<p>
+									<em>Anatomy of a callback</em>: <code>function( event, related ) { this }</code>
+								</p>
+								<ul>
+									<li><code>event</code> is the original click event that changed the state of the activable element,
+									<li><code>related</code> is the "related target", if an <a href="#internal-relations">internal relation</a> was defined for this activable element,
+									<li><code>this</code>, the context of the callback, is the activable DOM element that just changed state.
+								</ul>
+							</dd>
+							<dt><code>.toggle( activateCallback, deactivateCallback )</code></dt>
+							<dd>
+								<p>
+									This method can be used as a shorthand to add an event listener for both event types at the same type.
+								</p>
+							</dd>
+							<dt><code>.off( type, [callback] )</code></dt>
+							<dd>
+								<p>
+									This method removes a previously added event listener from a DOM element. It's possible to remove a specific event listener by providing its <code>type</code> as well as the registered <code>callback</code>, or to remove all listeners of a certain <code>type</code> by omitting the <code>callback</code> parameter.
+								</p>
+							</dd>
+						</dl>
+					</div>
+				</div>
+
+				<div id="direct-modifiers" class="row">
+					<div class="span8">
+						<h3>Direct Modifiers</h3>
+
+						<dl>
+							<dt><code>.activate()</code></dt>
+							<dd>
+								<p>
+									If the element isn't already active, this method gives it the <code>active</code> class and fires an internal <code>activate</code> event. If the behavior of the component is <code>"1"</code> or <code>"01"</code>, other elements of the same group are deactivated.
+								</p>
+							</dd>
+							<dt><code>.deactivate()</code></dt>
+							<dd>
+								<p>
+									If the element is active and if the behavior of the component is <code>"01"</code> or <code>"0X"</code>, this method removes the <code>active</code> class and fires an internal <code>deactivate</code> event.
+								</p>
+							</dd>
+							<dt><code>.toggle()</code></dt>
+							<dd>
+								<p>
+									<code>.activate()</code> an inactive element or <code>.deactivate()</code> an active element.
+								</p>
+							</dd>
+						</dl>
+					</div>
+				</div>
+
+				<div id="iterative-modifiers" class="row">
+					<div class="span8">
+						<h3>Iterative Modifiers (activable lists only)</h3>
+
+						<dl>
+							<dt><code>.next()</code></dt>
+							<dd>
+								<p>
+									This method deactivates the currently active element in an activable list and activates its next sibling. All previous siblings are marked with a <code>before-active</code> class.
+								</p>
+							</dd>
+							<dt><code>.prev()</code></dt>
+							<dd>
+								<p>
+									This method deactivates the currently active element in an activable list and activates its previous sibling. The <code>before-active</code> class is removed from the element that is being activated.
+								</p>
+							</dd>
+							<dt><code>.activate( index )</code></dt>
+							<dd>
+								<p>
+									This method deactivates the currently active element in an activable list and activates the element at the given <code>index</code>. All previous siblings are marked with a <code>before-active</code> class.
+								</p>
+							</dd>
+						</dl>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</body>
+</html>

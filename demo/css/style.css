@@ -196,13 +196,13 @@ body {
 }
 
 #act-nav {
-	padding: 30px;
+	padding: 30px 10px;
 	border-bottom: 1px solid #EEE;
 	margin: 0;
 	display: table;
 	width: 880px;
 	table-layout: fixed;
-	border-spacing: 30px 0;
+	border-spacing: 10px 0;
 }
 
 #act-nav:before, #act-nav:after {
@@ -218,18 +218,16 @@ body {
 #act-nav > li > a {
 	color: white;
 }
+#act-nav > li > a:hover {
+	box-shadow: 0 0 3px white;
+}
 
-#act-nav-demo > a { background: #7BD; }
-#act-nav-src > a { background: #A7D; }
-#act-nav-docs > a { background: #D79; }
-#act-nav-fork > a { background: #DD7; }
-#act-nav-get > a { background: #7D8; }
-
-#act-nav-demo.active > a, #act-nav-demo:hover > a { background: #08C; }
-#act-nav-src.active > a, #act-nav-src:hover > a { background: #60C; }
-#act-nav-docs.active > a, #act-nav-docs:hover > a { background: #C03; }
-#act-nav-fork.active > a, #act-nav-fork:hover > a { background: #CC0; }
-#act-nav-get.active > a, #act-nav-get:hover > a { background: #0C2; }
+#act-nav-intro a { background: #08C; }
+#act-nav-demo a { background: #40C; }
+#act-nav-src a { background: #C08; }
+#act-nav-docs a { background: #C30; }
+#act-nav-fork a { background: #9C0; }
+#act-nav-get a { background: #0C3; }
 
 .row {
 	margin-top: 20px;
@@ -250,4 +248,24 @@ body {
 	line-height: 25px;
 	border: 1px solid #E5E5E5;
 	border-radius: 4px;
+}
+
+#docs {
+	margin-top: 20px;
+}
+
+#docs > nav {
+	position: fixed;
+	background: white;
+	padding: 10px 0;
+	border: 1px solid #eee;
+	border-radius: 4px;
+}
+
+#docs > nav code {
+	font-size: 9px;
+}
+
+#docs code {
+	color: #333;
 }

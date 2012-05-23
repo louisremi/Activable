@@ -205,7 +205,7 @@ function off( uuid, type, handler, allHandlers, match ) {
 	var registeredHandlers, i;
 
 	if ( ( type == match || type == "both" ) && ( registeredHandlers = allHandlers[ uuid ] ) ) {
-		// remove one handler
+		// remove one specific handler
 		if ( handler ) {
 			i = registeredHandlers.length;
 			while ( i-- ) {
@@ -214,7 +214,7 @@ function off( uuid, type, handler, allHandlers, match ) {
 				}
 			}
 
-		// remove all handlers
+		// remove all handlers of the given type
 		} else {
 			delete allHandlers[ uuid ];
 		}
