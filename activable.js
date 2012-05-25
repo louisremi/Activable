@@ -1,3 +1,17 @@
+/*
+* Activable: declarative UI components | 2K, 0 dependency, IE8 compatible
+*
+* latest version, README and documentation available on Github:
+* https://github.com/louisremi/Activable
+*
+* Copyright 2012 @louis_remi
+* Licensed under the MIT license.
+*
+* Want to show some love?
+* Send me music http://www.amazon.co.uk/wishlist/HNTU0468LQON
+*
+*/
+
 (function(window,document,Math,undefined) {
 
 // feature detection

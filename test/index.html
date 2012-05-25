@@ -11,25 +11,9 @@
 
 module("standard features");
 
-test("basic feature : toggle active on click", function() {
-  var $target;
 
-  $target = $("#test1>li:eq(0)").click();
-  ok( $target.hasClass( "active" ), "an element that wasn't `.active` becomes `.active` once clicked" );
 
-  $target = $("#test1>li:eq(1)").Click();
-  ok( !$target.hasClass( "active" ), "an element that was `.active` is no more `.active` once clicked" );
-
-  $target = $("#test1>li:eq(2)");
-  $("#test1_item3").Click();
-  ok( $target.hasClass( "active" ), "an element that wasn't `.active` becomes `.active` once one of its children is clicked" );
-
-  $target = $("#test1>li:eq(3)");
-  $("#test1_item4").Click();
-  ok( !$target.hasClass( "active" ), "an element that was `.active` is no more `.active` once one of its children is clicked" );
-});
-
-test("tab behavior with `[data-group]`", function() {
+test("data-activable=1 + data-group", function() {
   var $target, $previous;
 
   $target = $("#test3>li:eq(0)").Click();
@@ -50,7 +34,7 @@ test("tab behavior with `[data-group]`", function() {
   ok( !$previous.hasClass( "active" ), "... and the previously `.active` element is no more `.active`" );
 });
 
-test("accordion behavior with `[data-group^=-]`", function() {
+test("data-activable=01 + data-group", function() {
   var $target, $previous;
 
   $target = $("#test2>li:eq(0)").Click();
@@ -71,10 +55,84 @@ test("accordion behavior with `[data-group^=-]`", function() {
   ok( !$target.hasClass( "active" ), "an element that was `.active` is no more `.active` once clicked" );
 });
 
-test("clicks on `<body>` and `<html>` don't throw", function() {
-	ok( $( document.body ).Click(), "body didn't throw" );
-	// for some reasons it never throws in Firefox
-	ok( $( document.documentElement ).Click(), "html didn't throw" );
+test("data-activable=0X", function() {
+  var $target;
+
+  $target = $("#test1>li:eq(0)").click();
+  ok( $target.hasClass( "active" ), "an element that wasn't `.active` becomes `.active` once clicked" );
+
+  $target = $("#test1>li:eq(1)").Click();
+  ok( !$target.hasClass( "active" ), "an element that was `.active` is no more `.active` once clicked" );
+
+  $target = $("#test1>li:eq(2)");
+  $("#test1_item3").Click();
+  ok( $target.hasClass( "active" ), "an element that wasn't `.active` becomes `.active` once one of its children is clicked" );
+
+  $target = $("#test1>li:eq(3)");
+  $("#test1_item4").Click();
+  ok( !$target.hasClass( "active" ), "an element that was `.active` is no more `.active` once one of its children is clicked" );
+});
+
+module("activable list");
+
+test("data-activable", function() {
+  var $target, $previous;
+
+  $target = $("#test3d>li:eq(0)").Click();
+  ok( $target.hasClass( "active" ), "an element that wasn't `.active` becomes `.active` once clicked" );
+
+  $previous = $target;
+  $target = $("#test3d>li:eq(1)").Click();
+  ok( $target.hasClass( "active" ), "another element that wasn't `.active` becomes `.active` once clicked..." );
+  ok( !$previous.hasClass( "active" ), "... and the previously `.active` element is no more `.active`" );
+
+  $target.Click();
+  ok( $target.hasClass( "active" ), "an element that was `.active` is still `.active` once clicked" );
+
+  $previous = $target;
+  $target = $("#test3d>li:eq(2)");
+  $("#test3d_item3").Click();
+  ok( $target.hasClass( "active" ), "another element that wasn't `.active` becomes `.active` once one of its children is clicked..." );
+  ok( !$previous.hasClass( "active" ), "... and the previously `.active` element is no more `.active`" );
+});
+
+test("data-activable=01", function() {
+  var $target, $previous;
+
+  $target = $("#test2d>li:eq(0)").Click();
+  ok( $target.hasClass( "active" ), "an element that wasn't `.active` becomes `.active` once clicked" );
+
+  $previous = $target;
+  $target = $("#test2d>li:eq(1)").Click();
+  ok( $target.hasClass( "active" ), "another element that wasn't `.active` becomes `.active` once clicked..." );
+  ok( !$previous.hasClass( "active" ), "... and the previously `.active` element is no more `.active`" );
+
+  $previous = $target;
+  $target = $("#test2d>li:eq(2)");
+  $("#test2d_item3").Click();
+  ok( $target.hasClass( "active" ), "another element that wasn't `.active` becomes `.active` once one of its children is clicked..." );
+  ok( !$previous.hasClass( "active" ), "... and the previously `.active` element is no more `.active`" );
+
+  $target.Click();
+  ok( !$target.hasClass( "active" ), "an element that was `.active` is no more `.active` once clicked" );
+});
+
+test("data-activable=0X", function() {
+  var $target;
+
+  $target = $("#test1d>li:eq(0)").click();
+  ok( $target.hasClass( "active" ), "an element that wasn't `.active` becomes `.active` once clicked" );
+
+  $target = $("#test1d>li:eq(1)").Click();
+  ok( !$target.hasClass( "active" ), "an element that was `.active` is no more `.active` once clicked" );
+
+  $target = $("#test1d>li:eq(2)");
+  $("#test1d_item3").Click();
+  ok( $target.hasClass( "active" ), "an element that wasn't `.active` becomes `.active` once one of its children is clicked" );
+
+  $target = $("#test1d>li:eq(3)");
+  $("#test1d_item4").Click();
+  ok( !$target.hasClass( "active" ), "an element that was `.active` is no more `.active` once one of its children is clicked" );
 });
 
 module( "activation anchor" );
@@ -126,13 +184,18 @@ test("toggle active on internal target", function() {
 
 });
 
-/*test("prevent default", function() {
+module("JS API - Basic Methods");
 
-  $("#test5_anchor").Click();
-  equal( window.location.hash, "", "window.location.hash is empty" );
-});*/
+test("Activable()/A()", function() {
+  equal( Activable, A, "Activable and A are equal" );
 
-module( "Activable API" );
+  var $target = $("#test1");
+  equal( A( document.getElementById("test1") )[0], $target[0], "passing a DOM element to A()" );
+
+  equal( A( "#test1" )[0], $target[0], "passing a selector string to A()" );
+});
+
+module( "JS API - Direct Modifiers" );
 
 test("A.activate()/A.deactivate()/A.toggle()", function() {
   var $target;
@@ -160,6 +223,8 @@ test("A.activate()/A.deactivate()/A.toggle() and tab behavior", function() {
   ok( $target.hasClass( "active" ) && !$("#test7>li:eq(0)").hasClass("active"), "switch the active element with toggle");
 });
 
+module( "JS API - Event Listeners" );
+
 test("event listening", function() {
   expect(0);
 
@@ -167,10 +232,23 @@ test("event listening", function() {
   $("#test8>li:eq(0)").Click();
 })
 
+module("miscellaneous");
+
+test("clicks on `<body>` and `<html>` don't throw", function() {
+  ok( $( document.body ).Click(), "body didn't throw" );
+  // for some reasons it never throws in Firefox
+  ok( $( document.documentElement ).Click(), "html didn't throw" );
+});
+
+/*test("prevent default", function() {
+
+  $("#test5_anchor").Click();
+  equal( window.location.hash, "", "window.location.hash is empty" );
+});*/
+
 /* TOTEST;
  * - preventDefault
  * - Activable API
- * - delegation
  */
 
 
@@ -205,56 +283,75 @@ jQuery.fn.Click = function() { return this.each(function(i,el) { fireClick(el); 
  <div id="qunit-fixture">
  	
  	<ul id="test1">
- 		<li class="activable">item1</li>
- 		<li class="activable active">item2</li>
-		<li class="activable"><span><span><span id="test1_item3">item3</span></span></span></li>
- 		<li class="activable active"><span><span><span id="test1_item4">item4</span></span></span></li>
+ 		<li data-activable=0X>item1</li>
+ 		<li data-activable=0X class="active">item2</li>
+		<li data-activable=0X><span><span><span id="test1_item3">item3</span></span></span></li>
+ 		<li data-activable=0X class="active"><span><span><span id="test1_item4">item4</span></span></span></li>
 	</ul>
 
   <ul id="test3">
-    <li class="activable" data-group="grp1">item1</li>
-    <li class="activable" data-group="grp1">item2</li>
-    <li class="activable" data-group="grp1"><span><span><span id="test3_item3">item3</span></span></span></li>
+    <li data-activable data-group="grp1">item1</li>
+    <li data-activable data-group="grp1">item2</li>
+    <li data-activable data-group="grp1"><span><span><span id="test3_item3">item3</span></span></span></li>
   </ul>
 
 	<ul id="test2">
-		<li class="activable" data-group="-grp0">item1</li>
- 		<li class="activable" data-group="-grp0">item2</li>
-		<li class="activable" data-group="-grp0"><span><span><span id="test2_item3">item3</span></span></span></li>
+		<li data-activable=01 data-group="grp0">item1</li>
+ 		<li data-activable=01 data-group="grp0">item2</li>
+		<li data-activable=01 data-group="grp0"><span><span><span id="test2_item3">item3</span></span></span></li>
 	</ul>
 
 	<ul id="test4">
-    <li class="activable"><!-- comment1 --><!-- comment2 --><a id="test4_item1">item1</a></li>
-    <li class="activable"><a>item2</a><span id="test4_span2">outside</span></li>
-    <li class="activable"><span><a id="test4_item3">item3</a></span></li>
-    <li class="activable"><a><span><span><span id="test4_item4">item4</span></span></span></a></li>
-    <li class="activable active"><!-- comment --><a id="test4_item5">item5</a></li>
+    <li data-activable=0X><!-- comment1 --><!-- comment2 --><a id="test4_item1">item1</a></li>
+    <li data-activable=0X><a>item2</a><span id="test4_span2">outside</span></li>
+    <li data-activable=0X><span><a id="test4_item3">item3</a></span></li>
+    <li data-activable=0X><a><span><span><span id="test4_item4">item4</span></span></span></a></li>
+    <li data-activable=0X class="active"><!-- comment --><a id="test4_item5">item5</a></li>
   </ul>
 
   <ul id="test5">
-    <li class="activable"><!-- comment1 --><!-- comment2 --><a id="test5_item1" href="#exists">item1</a></li>
-    <li class="activable"><a id="test5_item2" href="#doesntexist">item2</a></li>
-    <li class="activable active"><a id="test5_item3" href="#inactive">item3</a></li>
+    <li data-activable=0X><!-- comment1 --><!-- comment2 --><a id="test5_item1" href="#exists">item1</a></li>
+    <li data-activable=0X><a id="test5_item2" href="#doesntexist">item2</a></li>
+    <li data-activable=0X class="active"><a id="test5_item3" href="#inactive">item3</a></li>
   </ul>
 
   <div id="exists"></div>
   <div id="inactive"></div>
 
-  <p><a id="test5_anchor" class="activable" href="#test5_span"></a><span id="test5_span"></p>
+  <p><a id="test5_anchor" data-activable=0X href="#test5_span"></a><span id="test5_span"></p>
 
   <ul id="test6">
-    <li class="activable">item1</li>
-    <li class="activable active">item2</li>
+    <li data-activable=0X>item1</li>
+    <li data-activable=0X class="active">item2</li>
   </ul>
 
    <ul id="test7">
-    <li class="activable" data-group="grp1">item1</li>
-    <li class="activable active" data-group="grp1">item2</li>
+    <li data-activable data-group="grp1">item1</li>
+    <li data-activable data-group="grp1" class="active">item2</li>
   </ul>
 
   <ul id="test8">
-    <li class="activable">item1</li>
-    <li class="activable active">item2</li>
+    <li data-activable=0X>item1</li>
+    <li data-activable=0X class="active">item2</li>
+  </ul>
+
+  <ul id="test1d" data-activable=0X>
+    <li>item1</li>
+    <li class="active">item2</li>
+    <li><span><span><span id="test1d_item3">item3</span></span></span></li>
+    <li class="active"><span><span><span id="test1d_item4">item4</span></span></span></li>
+  </ul>
+
+  <ul id="test3d" data-activable>
+    <li>item1</li>
+    <li>item2</li>
+    <li><span><span><span id="test3d_item3">item3</span></span></span></li>
+  </ul>
+
+  <ul id="test2d" data-activable=01>
+    <li>item1</li>
+    <li>item2</li>
+    <li><span><span><span id="test2d_item3">item3</span></span></span></li>
   </ul>
  </div>
 </body>

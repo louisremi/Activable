@@ -20,7 +20,7 @@ Activable helps you build modern UI components quicker and keep your code clean.
 </div>
 ```
 
-Once appropriately styled with CSS (Twitter Bootsrap is a good fit here), the components are fully functional: **no need to initialize them with JS**, ever. **No need for jQuery** either!
+Since Activable uses a global event listeners, once the components are appropriately styled with CSS they are fully functional: **no need to initialize them with JS**, ever.
 
 Demo
 ====
