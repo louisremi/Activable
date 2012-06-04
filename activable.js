@@ -30,7 +30,8 @@ var isStandard = "addEventListener" in window,
 	prefixes = {
 		"WebkitT": "webkitTransitionEnd",
 		"MozT": "transitionend",
-		"msT": "MSTransitionEnd",
+		// transitions are unprefixed in IE10
+		//"msT": "msTransitionEnd",
 		// Opera has the strangest behavior
 		//"OT": "oTransitionEnd",
 		"t": "transitionend"
@@ -59,18 +60,18 @@ function Activable( elem ) {
 Activable.prototype = {
 	activate: function( index ) {
 		index ?
-			seek( this[0], undefined, index ) :
+			seek( this[0], undefined, undefined, index ) :
 			activeHandler({ target: this[0], type: "add" });
 	},
 	deactivate: function() {
 		activeHandler({ target: this[0], type: "remove" });
 	},
 
-	next: function() {
-		seek( this[0], "n" );
+	next: function( loop ) {
+		seek( this[0], "n", loop );
 	},
-	prev: function() {
-		seek( this[0], "p" );
+	prev: function( loop ) {
+		seek( this[0], "p", loop );
 	},
 
 	on: function( type, handler ) {
@@ -165,12 +166,7 @@ function activeHandler( event ) {
 	if ( isActivable != "0X" ) {
 		// if delegation is used, search for an active element with the same parent
 		if ( delegater ) {
-			eachChild( delegater, function(el) {
-				if ( c( el, "has", "active" ) ) {
-					previouslyActive = el;
-					return false;
-				}
-			});
+			previouslyActive = getChildren( delegater, ".active" )[0];
 
 		// search for an active element in the same group
 		} else if ( ( group = ( target ).getAttribute( "data-group" ) ) ) {
@@ -195,10 +191,7 @@ function activeHandler( event ) {
 }
 
 function findActivationAnchor( elem, firstElemChild ) {
-	eachChild( elem, function(el) {
-		firstElemChild = el;
-		return false;
-	});
+	firstElemChild = getChildren( elem )[0];
 
 	return firstElemChild && firstElemChild.nodeName == "A" && firstElemChild;
 }
@@ -268,65 +261,74 @@ function make( targets, verb, event ) {
 	}
 }
 
-function eachChild( elem, callback ) {
-	var children = elem.children,
-		i = -1,
-		length = children.length;
+function getChildren( parent, selector ) {
+	var curId = parent.id,
+		tmpId = parent.id = "act" + ( Math.random() * 1E9 |0 ),
+		children = parent.parentNode.querySelectorAll( "#" + tmpId + ">" + ( selector || "*" ) );
 
-	while ( ++i < length ) {
-		if ( children[i].nodeType == 1 ) {
-			if ( callback( children[i] ) === false ) {
-				break;
-			}
-		}
-	}
+	parent.id = curId;
+
+	return children || [];
 }
 
-function seek( elem, rel, index ) {
-	var i = 0,
-		prevChild,
-		isActive;
+function seek( parent, rel, loop, index ) {
+	var children = getChildren( parent ),
+		length = children.length,
+		i = length,
+		prevActive,
+		parentStyle,
+		parentDisplay;
 
-	eachChild( elem, function(el) {
-		isActive = c( el, "has", "active" );
+	while ( i-- ) {
+		if ( c( children[i], "has", "active" ) ) {
+			prevActive = i;
+			break;
+		}
+	}
 
-		// using .activate( <index> )
-		if ( index ) {
-			if ( i == index ) {
-				// activate target
-				activeHandler({ target: el, type: "add" });
-			} else if ( isActive ) {
-				// deactivate previously active one
-				activeHandler({ target: el, type: "remove" });
-			}
+	if ( rel ) {
+		index = prevActive + ( rel == "p" ?	-1 : 1 );
+	}
 
-			c( el, i < index ? "add" : "remove", "before-active" );
+	// return immediatly if:
+	// - there's less than two items in the list
+	// - the target item is the same as the currently active one
+	// - loop is false & an end of the list is reached
+	if ( 
+		length < 2 ||
+		( !rel && index == prevActive ) ||
+		( !loop && ( index < 0 || index >= length ) )
+	) {
+		return;
+	}
 
-		// using .prev()
-		} else if ( rel == "p" ) {
-			if ( isActive && prevChild ) {
-				c( prevChild, "remove", "before-active" );
-				activeHandler({ target: prevChild, type: "add" });
-				activeHandler({ target: el, type: "remove" });
-				return false;
-			}
-			prevChild = el;
-
-		// using .next()
-		} else {
-			if ( prevChild ) {
-				activeHandler({ target: el, type: "add" });
-				activeHandler({ target: prevChild, type: "remove" });
-				c( prevChild, "add", "before-active" );
-				return false;
-			}
-			if ( isActive ) {
-				prevChild = el;
-			}
+	// move an item physically in the list if necessary
+	if ( index < 0 || index >= length ) {
+		// temporarily hide the list to prevent all items to be animated at once in these cases
+		if ( transition ) {
+			parentStyle = parent.style;
+			parentDisplay = parentStyle.display;
+			parentStyle.display = "none";
+			// make sure the browser is aware of this change
+			getComputedStyle( parent, "display" );
 		}
 
-		i++;
-	});
+		index < 0 ?
+			parent.appendChild( parent.removeChild( children[ prevActive ] ) ) :
+			parent.insertBefore( parent.removeChild( children[ prevActive ] ), children[0] );
+
+		if ( transition ) {
+			parentStyle.display = parentDisplay;
+			// here again
+			getComputedStyle( parent, "display" );
+		}
+	}
+
+	// make sure index is in our list
+	index = ( index + length ) % length;
+
+	activeHandler({ target: children[ prevActive ], type: "remove" });
+	activeHandler({ target: children[ index ], type: "add" });
 }
 
 function autoDim( elem, dimension, verb ) {
@@ -371,6 +373,8 @@ function transitionendHandler( event ) {
 	target.style[ transition ] = "";
 }
 
+// This function is only used when transitions are available,
+// so ne need for feature detection.
 function getComputedStyle( elem, prop ) {
 	return window.getComputedStyle( elem )[ prop ];
 }

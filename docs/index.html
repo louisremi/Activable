@@ -152,6 +152,11 @@
 				<div id="events" class="row">
 					<div class="span8">
 						<h3>Event Listeners</h3>
+						<p>
+							Every time an element is activated or deactivated, the corresponding event fires on that
+							element and bubbles up in the DOM tree. It is possible to listen to those events using
+							the following methods.
+						</p>
 
 						<dl>
 							<dt><code>.on( type, callback )</code></dt>
@@ -213,25 +218,38 @@
 
 				<div id="iterative-modifiers" class="row">
 					<div class="span8">
-						<h3>Iterative Modifiers (activable lists only)</h3>
+						<h3>Iterative Modifiers</h3>
+						<p>
+							These methods work on activable lists only and are particularily useful to create carousels (or cycle) components.
+						</p>
+						<p>
+							Note that you can use the selector <code>.active ~ li</li> to differentiate the previous sibling items from the following one.
+						</p>
 
 						<dl>
-							<dt><code>.next()</code></dt>
+							<dt><code>.next( loop )</code></dt>
 							<dd>
 								<p>
-									This method deactivates the currently active element in an activable list and activates its next sibling. All previous siblings are marked with a <code>before-active</code> class.
+									This method deactivates the currently active element in an activable list and activates its next sibling.
+								</p>
+								<p>
+									By default, when the last element of the list is already active, this method has no effect. If <code>loop</code> is true, the last element is moved to the first position of the list and the next element is activated.
 								</p>
 							</dd>
-							<dt><code>.prev()</code></dt>
+							<dt><code>.prev( loop )</code></dt>
 							<dd>
 								<p>
-									This method deactivates the currently active element in an activable list and activates its previous sibling. The <code>before-active</code> class is removed from the element that is being activated.
+									This method deactivates the currently active element in an activable list and activates its previous sibling.
+								</p>
+								<p>
+									By default, when the first element of the list is already active, this method has no effect. 
+									If <code>loop</code> is true, the first element is moved to the last position of the list and the previous element is activated.
 								</p>
 							</dd>
 							<dt><code>.activate( index )</code></dt>
 							<dd>
 								<p>
-									This method deactivates the currently active element in an activable list and activates the element at the given <code>index</code>. All previous siblings are marked with a <code>before-active</code> class.
+									This method deactivates the currently active element in an activable list and activates the element at the given <code>index</code>.
 								</p>
 							</dd>
 						</dl>

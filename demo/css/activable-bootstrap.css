@@ -53,7 +53,7 @@
 .carousel > li.item {
 	position: absolute;
 	top: 0;
-	left: 100%;
+	left: -100%;
 	display: block;
 }
 
@@ -62,11 +62,11 @@
 	left: 0;
 }
 
-.carousel > li.before-active {
-	left: -100%;
+.carousel > li.active ~ li {
+	left: 100%;
 }
 
-.carousel + a, .carousel + a + a {
+.carousel ~ a {
 	text-decoration: none;
 }
 

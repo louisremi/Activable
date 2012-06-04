@@ -223,14 +223,44 @@ test("A.activate()/A.deactivate()/A.toggle() and tab behavior", function() {
   ok( $target.hasClass( "active" ) && !$("#test7>li:eq(0)").hasClass("active"), "switch the active element with toggle");
 });
 
-module( "JS API - Event Listeners" );
+module("JS API - Iterative Modifiers");
+
+test(".next( false ) / .prev( false ) / .activate( index, false )", function() {
+
+  A("#test9").next();
+  equal( A("#test9 .active")[0].id, "test9_item2", ".next() makes next item active" );
+
+  A("#test9").prev();
+  equal( A("#test9 .active")[0].id, "test9_item1", ".prev() makes previous item active" );
+
+  A("#test9").prev();
+  equal( A("#test9 .active")[0].id, "test9_item1", ".prev() doesn't have any effect when first element is active" );
+
+  A("#test9").activate( 2 );
+  equal( A("#test9 .active")[0].id, "test9_item3", ".activate( index ) activate the element at the given index" );
+
+  A("#test9").next();
+  equal( A("#test9 .active")[0].id, "test9_item3", ".next() doesn't have any effect when last element is active" );
+});
+
+test(".next( true ) / .prev( true ) / .activate( index, true )", function() {
+
+  A("#test10").prev( true );
+  equal( A("#test10 .active")[0].id, "test10_item3", ".prev( true ) is able to loop" );
+
+  A("#test10").next( true );
+  equal( A("#test10 .active")[0].id, "test10_item1", ".next( true ) is able to loop" );
+
+});
+
+/*module( "JS API - Event Listeners" );
 
 test("event listening", function() {
   expect(0);
 
   A( $("#test8>li:eq(0)")[0] ).on("activate", function(){  });
   $("#test8>li:eq(0)").Click();
-})
+});*/
 
 module("miscellaneous");
 
@@ -248,7 +278,7 @@ test("clicks on `<body>` and `<html>` don't throw", function() {
 
 /* TOTEST;
  * - preventDefault
- * - Activable API
+ * - Event API
  */
 
 
@@ -352,6 +382,18 @@ jQuery.fn.Click = function() { return this.each(function(i,el) { fireClick(el); 
     <li>item1</li>
     <li>item2</li>
     <li><span><span><span id="test2d_item3">item3</span></span></span></li>
+  </ul>
+
+  <ul id="test9" data-activable>
+    <li id="test9_item1" class="active">item1
+    <li id="test9_item2">item2
+    <li id="test9_item3">item3
+  </ul>
+
+  <ul id="test10" data-activable>
+    <li id="test10_item1" class="active">item1
+    <li id="test10_item2">item2
+    <li id="test10_item3">item3
   </ul>
  </div>
 </body>
