@@ -310,7 +310,7 @@ function seek( parent, rel, loop, index ) {
 			parentDisplay = parentStyle.display;
 			parentStyle.display = "none";
 			// make sure the browser is aware of this change
-			getComputedStyle( parent, "display" );
+			getComputedStyle( parent ).display;
 		}
 
 		index < 0 ?
@@ -320,7 +320,7 @@ function seek( parent, rel, loop, index ) {
 		if ( transition ) {
 			parentStyle.display = parentDisplay;
 			// here again
-			getComputedStyle( parent, "display" );
+			getComputedStyle( parent ).display;
 		}
 	}
 
@@ -334,16 +334,16 @@ function seek( parent, rel, loop, index ) {
 function autoDim( elem, dimension, verb ) {
 	var from, to;
 
-	from = getComputedStyle( elem, dimension );
+	from = getComputedStyle( elem )[ dimension ];
 	// transitions should be temporarily disabled for Chrome
 	elem.style[ transition ] = "none";
 	c( elem, verb, "active" );
 	// make sure the inline style is empty (not the case during a transition)
 	elem.style[ dimension ] = "";
-	to = getComputedStyle( elem, dimension );
+	to = getComputedStyle( elem )[ dimension ];
 	elem.style[ dimension ] = from;
 	// computed value has to be accessed to make sure the browser took it into account
-	getComputedStyle( elem, dimension );
+	getComputedStyle( elem )[ dimension ];
 	elem.style[ transition ] = "";
 	elem.style[ dimension ] = to;
 }
@@ -369,14 +369,8 @@ function transitionendHandler( event ) {
 	// This line is enough to get the job done in Firefox
 	target.style[ matches[1] ] = "";
 	// the following 2 lines are part of workaround for Chrome as well
-	getComputedStyle( target, transition );
+	getComputedStyle( target )[ transition ];
 	target.style[ transition ] = "";
-}
-
-// This function is only used when transitions are available,
-// so ne need for feature detection.
-function getComputedStyle( elem, prop ) {
-	return window.getComputedStyle( elem )[ prop ];
 }
 
 // c, an expressive className manipulation library
