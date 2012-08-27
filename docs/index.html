@@ -71,13 +71,14 @@
 								<ul>
 									<li><b><code>"1" </code></b> stands for "<b>1 and always 1 is active</b>" and means that when one element is <code>.active</code> the other elements of the same group lose this class (default value).
 									<li><b><code>"01"</code></b> stands for "<b>0 or 1 is active</b>" and has the same behavior as `"1"`, but the state of an element can be toggled.
+									<li><b><code>"T"</code></b> stands for "<b>0 or 1 is temporarily active</b>" and has the same behavior as `"01"`, but active elements are deactivated on the next click on the document.
 									<li><b><code>"0X"</code></b> stands for "<b>0 or X are active</b>" and means that state changes don't affect the elements of the same group.
 								</ul>
 							<li><b><code>@data-group</code></b> can be used to indicate which group (or component instance) this element is part of: every element sharing the same value for this attribute will be part of the same group.
 							<li><b><code>.active</code></b> should be targeted in CSS to render the elements of an activable components according to their state.
 						</ul>
 
-						<iframe style="width: 100%; height: 280px;" src="http://jsfiddle.net/utFNt/2/embedded/html,result,css" frameborder="0"></iframe>
+						<iframe style="width: 100%; height: 280px;" src="http://jsfiddle.net/utFNt/3/embedded/html,result,css" frameborder="0"></iframe>
 					</div>
 				</div>
 
@@ -89,7 +90,7 @@
 							To reduce the noise in the markup, activable lists can be used: all children items of an <b><code>&lt;ul&nbsp;data-activable&gt;</code></b> will be considered activable, in the same group, with the same behavior. The <code>&lt;ul&gt;</code> itself will not be activable. 
 						</p>
 
-						<iframe style="width: 100%; height: 280px;" src="http://jsfiddle.net/HVgva/3/embedded/html,result,css" frameborder="0"></iframe>
+						<iframe style="width: 100%; height: 280px;" src="http://jsfiddle.net/HVgva/4/embedded/html,result,css" frameborder="0"></iframe>
 					</div>
 				</div>
 
@@ -101,7 +102,7 @@
 							By default, clicking anywhere inside an activable element activates or toggles the active state of this element. The "click sensitive" area of an activable element can be restricted using activation anchors: if the first child of an activable element is an <b><code>&lt;a&gt;</code></b>, the element will change state only when this anchor is clicked.
 						</p>
 
-						<iframe style="width: 100%; height: 280px;" src="http://jsfiddle.net/XaXEB/3/embedded/html,result,css" frameborder="0"></iframe>
+						<iframe style="width: 100%; height: 280px;" src="http://jsfiddle.net/XaXEB/4/embedded/html,result,css" frameborder="0"></iframe>
 					</div>
 				</div>
 
@@ -176,7 +177,7 @@
 							<dt><code>.toggle( activateCallback, deactivateCallback )</code></dt>
 							<dd>
 								<p>
-									This method can be used as a shorthand to add an event listener for both event types at the same type.
+									This method can be used as a shorthand to add an event listener for both event types at the same time.
 								</p>
 							</dd>
 							<dt><code>.off( type, [callback] )</code></dt>

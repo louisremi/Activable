@@ -20,7 +20,7 @@ Activable helps you build modern UI components quicker and keep your code clean.
 </div>
 ```
 
-Since Activable uses a global event listeners, once the components are appropriately styled with CSS they are fully functional: **no need to initialize them with JS**, ever.
+Since Activable uses a global event listener, once the components are appropriately styled with CSS they are fully functional: **no need to initialize them with JS**, ever.
 
 Demo
 ====

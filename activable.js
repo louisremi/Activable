@@ -26,7 +26,7 @@ var isStandard = "addEventListener" in window,
 	rauto = /(?:^| )auto(\w*)-onactivate(?: |$)/,
 	_ransition = "ransition",
 	html = document.documentElement,
-	prefx,
+	prfx,
 	prefixes = {
 		"WebkitT": "webkitTransitionEnd",
 		"MozT": "transitionend",
@@ -37,12 +37,13 @@ var isStandard = "addEventListener" in window,
 		"t": "transitionend"
 	},
 	transition,
-	transitionend;
+	transitionend,
+	temporary;
 
 // transition feature detection
-for ( prefx in prefixes ) {
-	if ( ( transition = prefx + _ransition ) in html.style ) {
-		transitionend = prefixes[ prefx ];
+for ( prfx in prefixes ) {
+	if ( ( transition = prfx + _ransition ) in html.style ) {
+		transitionend = prefixes[ prfx ];
 		break;
 	}
 	transition = undefined;
@@ -126,66 +127,93 @@ function activeHandler( event ) {
 		verb;
 
 	// search for an activable parent
-	while ( target && target.ownerDocument && ( isActivable = target.getAttribute("data-activable") ) == undefined ) {
+	while (
+		target &&
+		target.ownerDocument &&
+		( isActivable = target.getAttribute("data-activable") ) == undefined 
+	) {
 		descendants.unshift( target = target.parentNode );
 	}
 
-	// stop here if the last target is not activable
-	if ( isActivable == undefined ) {
-		return;
-	}
-	// default behavior is "1 and always 1 is active"
-	if ( isActivable == "" ) {
-		isActivable = "1"
-	}
+	// make sure we've found an activable target
+	if ( isActivable != undefined ) {
 
-	// if the element is an ul, delegation is being used;
-	if ( target.nodeName == "UL" && descendants[1] ) {
-		delegater = target;
-		target = descendants[1];
-		descendants.shift();
-	}
-
-	// search for an activation anchor
-	activationAnchor = findActivationAnchor( target );
-	isActive = c( target, "has", "active" );
-
-	// if an activation anchor exists, ignore clicks occuring outside of it
-	// also ignore programatically triggered actions when they don't change the current state
-	if ( 
-		( activationAnchor && event.type == "click" && activationAnchor != descendants[1] ) ||
-		( ( isActive && event.type == "add" ) || ( !isActive && event.type == "remove" ) )
-	) { return; }
-
-	verb = ( event.type == "click" || event.type == "toggle" ?
-		( isActive ? "remove" : "add" ) :
-		event.type
-	);
-
-	// unless the behavior is "O or X are active", deactivate the current active element
-	if ( isActivable != "0X" ) {
-		// if delegation is used, search for an active element with the same parent
-		if ( delegater ) {
-			previouslyActive = getChildren( delegater, ".active" )[0];
-
-		// search for an active element in the same group
-		} else if ( ( group = ( target ).getAttribute( "data-group" ) ) ) {
-			previouslyActive = document.querySelector( ".active[data-group=" + group + "]" );
+		// default behavior is "1 and always 1 is active"
+		if ( isActivable == "" ) {
+			isActivable = "1"
 		}
 
-		// if "1 and always 1 is active", check the target is not the same as the previously active
-		if ( isActivable == "1" && target == previouslyActive ) {
-			return preventDefault( event );
+		// if the element is an ul, delegation is being used;
+		if ( target.nodeName == "UL" && descendants[1] ) {
+			delegater = target;
+			target = descendants[1];
+			descendants.shift();
 		}
 
-		// deactivate the previously active element
-		if ( previouslyActive ) {
-			make( [ previouslyActive, delegater, findInternalTarget( findActivationAnchor( previouslyActive ) || previouslyActive ) ], "remove", event );
+		// search for an activation anchor
+		activationAnchor = findActivationAnchor( target );
+		isActive = c( target, "has", "active" );
+
+		// if an activation anchor exists, ignore clicks occuring outside of it
+		// also ignore programatically triggered actions when they don't change the current state
+		if ( 
+			!( activationAnchor && event.type == "click" && activationAnchor != descendants[1] ) &&
+			!( ( isActive && event.type == "add" ) || ( !isActive && event.type == "remove" ) )
+		) {
+
+			verb = ( event.type == "click" || event.type == "toggle" ?
+				( isActive ? "remove" : "add" ) :
+				event.type
+			);
+
+			// if the behavior is "O or 1 is active" or "1 and always 1 is active",
+			// deactivate the current active element
+			if ( isActivable == "01" || isActivable == "1" ) {
+				// if delegation is used, search for an active element with the same parent
+				if ( delegater ) {
+					previouslyActive = getChildren( delegater, ".active" )[0];
+
+				// search for an active element in the same group
+				} else if ( ( group = ( target ).getAttribute( "data-group" ) ) ) {
+					previouslyActive = document.querySelector( ".active[data-group=" + group + "]" );
+				}
+
+				// if "1 and always 1 is active", check the target is not the same as the previously active
+				if ( isActivable == "1" && target == previouslyActive ) {
+					return preventDefault( event );
+				}
+
+			}
+
+		// click occured outside of activation anchor
+		} else {
+			target = undefined;
 		}
+
+	// no activable parent found
+	} else {
+		target = undefined;
 	}
 
-	// activate or deactivate the target and the internal target
-	make( [ target, delegater, findInternalTarget( activationAnchor || target ) ], verb, event );
+	// deactivate the temporary element (make sure we don't deactivate it twice)
+	if ( temporary ) {
+		make( [ temporary, delegater, findActivationAnchor( temporary ) || temporary ], "remove", event );
+	}
+
+	// if the behavior is "temporary", remember the currently active element
+	if ( isActivable == "T" ) {
+		temporary = target;
+	}
+
+	// deactivate the previously active element
+	if ( previouslyActive ) {
+		make( [ previouslyActive, delegater, findActivationAnchor( previouslyActive ) || previouslyActive ], "remove", event );
+	}
+
+	if ( target ) {
+		// activate or deactivate the target and the internal target
+		make( [ target, delegater, activationAnchor || target ], verb, event );
+	}
 
 	preventDefault( event );
 }
@@ -232,6 +260,8 @@ function make( targets, verb, event ) {
 	var target = targets[0],
 		uuid, handlers, i, matches;
 
+	targets[2] = findInternalTarget( targets[2] );
+
 	if ( transition && ( matches = rauto.exec( ( targets[1] || target ).className ) ) ) {
 		if ( targets[2] ) {
 			autoDim( targets[2], matches[1], verb );
@@ -252,7 +282,9 @@ function make( targets, verb, event ) {
 			i = handlers.length;
 
 			while ( i-- ) {
-				if ( !handlers[i].call( targets[0], event, verb == "add" ? "activate" : "deactivate", targets[2] ) ) {
+				if ( !handlers[i].call( 
+					targets[0], event, verb == "add" ? "activate" : "deactivate", targets[2] 
+				) ) {
 					return;
 				}
 			}

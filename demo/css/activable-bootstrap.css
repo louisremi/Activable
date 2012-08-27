@@ -25,7 +25,7 @@
 	filter:alpha(opacity=100);
 }
 
-.dropdown-toggle:focus + .dropdown-menu {
+.dropdown.active .dropdown-menu {
 	display: block;
 }
 

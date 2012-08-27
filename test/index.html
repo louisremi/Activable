@@ -73,6 +73,35 @@ test("data-activable=0X", function() {
   ok( !$target.hasClass( "active" ), "an element that was `.active` is no more `.active` once one of its children is clicked" );
 });
 
+test("data-activable=T", function() {
+  var $target, $previous;
+
+  $target = $("#test2b>li:eq(0)").Click();
+  ok( $target.hasClass( "active" ), "an element that wasn't `.active` becomes `.active` once clicked" );
+
+  $previous = $target;
+  $target = $("#test2b>li:eq(1)").Click();
+  ok( $target.hasClass( "active" ), "another element that wasn't `.active` becomes `.active` once clicked..." );
+  ok( !$previous.hasClass( "active" ), "... and the previously `.active` element is no more `.active`" );
+
+  $previous = $target;
+  $target = $("#test2b>li:eq(2)");
+  $("#test2b_item3").Click();
+  ok( $target.hasClass( "active" ), "another element that wasn't `.active` becomes `.active` once one of its children is clicked..." );
+  ok( !$previous.hasClass( "active" ), "... and the previously `.active` element is no more `.active`" );
+
+  $target.Click();
+  ok( !$target.hasClass( "active" ), "an element that was `.active` is no more `.active` once clicked" );
+
+  $target.Click();
+  $(document.body).Click();
+  ok( !$target.hasClass( "active" ), "an element that was `.active` is no more `.active` once a non-activable element is clicked" );
+
+  $target.Click();
+  $("#test1>li:eq(2)").Click();
+  ok( !$target.hasClass( "active" ), "an element that was `.active` is no more `.active` once a different activable element is clicked" );
+});
+
 module("activable list");
 
 test("data-activable", function() {
@@ -115,6 +144,35 @@ test("data-activable=01", function() {
 
   $target.Click();
   ok( !$target.hasClass( "active" ), "an element that was `.active` is no more `.active` once clicked" );
+});
+
+test("data-activable=T", function() {
+  var $target, $previous;
+
+  $target = $("#test2db>li:eq(0)").Click();
+  ok( $target.hasClass( "active" ), "an element that wasn't `.active` becomes `.active` once clicked" );
+
+  $previous = $target;
+  $target = $("#test2db>li:eq(1)").Click();
+  ok( $target.hasClass( "active" ), "another element that wasn't `.active` becomes `.active` once clicked..." );
+  ok( !$previous.hasClass( "active" ), "... and the previously `.active` element is no more `.active`" );
+
+  $previous = $target;
+  $target = $("#test2db>li:eq(2)");
+  $("#test2db_item3").Click();
+  ok( $target.hasClass( "active" ), "another element that wasn't `.active` becomes `.active` once one of its children is clicked..." );
+  ok( !$previous.hasClass( "active" ), "... and the previously `.active` element is no more `.active`" );
+
+  $target.Click();
+  ok( !$target.hasClass( "active" ), "an element that was `.active` is no more `.active` once clicked" );
+
+  $target.Click();
+  $(document.body).Click();
+  ok( !$target.hasClass( "active" ), "an element that was `.active` is no more `.active` once a non-activable element is clicked" );
+
+  $target.Click();
+  $("#test1d>li:eq(2)").Click();
+  ok( !$target.hasClass( "active" ), "an element that was `.active` is no more `.active` once a different activable element is clicked" );
 });
 
 test("data-activable=0X", function() {
@@ -331,6 +389,12 @@ jQuery.fn.Click = function() { return this.each(function(i,el) { fireClick(el); 
 		<li data-activable=01 data-group="grp0"><span><span><span id="test2_item3">item3</span></span></span></li>
 	</ul>
 
+  <ul id="test2b">
+    <li data-activable=T>item1</li>
+    <li data-activable=T>item2</li>
+    <li data-activable=T><span><span><span id="test2b_item3">item3</span></span></span></li>
+  </ul>
+
 	<ul id="test4">
     <li data-activable=0X><!-- comment1 --><!-- comment2 --><a id="test4_item1">item1</a></li>
     <li data-activable=0X><a>item2</a><span id="test4_span2">outside</span></li>
@@ -382,6 +446,12 @@ jQuery.fn.Click = function() { return this.each(function(i,el) { fireClick(el); 
     <li>item1</li>
     <li>item2</li>
     <li><span><span><span id="test2d_item3">item3</span></span></span></li>
+  </ul>
+
+  <ul id="test2db" data-activable=T>
+    <li>item1</li>
+    <li>item2</li>
+    <li><span><span><span id="test2db_item3">item3</span></span></span></li>
   </ul>
 
   <ul id="test9" data-activable>

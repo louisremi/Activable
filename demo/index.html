@@ -44,6 +44,34 @@
 		</div>
 
 		<div class="row">
+			<!-- This works great, but shouldn't be part of this demo -->
+			<div class="span12 navbar navbar-static"><div class="navbar-inner">
+				<ul class="nav" data-activable=T>
+                  <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Drop 1<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                      <li><a href="#">Action</a></li>
+                      <li><a href="#">Another action</a></li>
+                      <li><a href="#">Something else here</a></li>
+                      <li class="divider"></li>
+                      <li><a href="#">Separated link</a></li>
+                    </ul>
+                  </li>
+                  <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">Drop 2 <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                      <li><a href="#">Action</a></li>
+                      <li><a href="#">Another action</a></li>
+                      <li><a href="#">Something else here</a></li>
+                      <li class="divider"></li>
+                      <li><a href="#">Separated link</a></li>
+                    </ul>
+                  </li>
+                </ul>
+			</div></div>
+		</div>
+
+		<div class="row">
 			<div class="span6">
 			    <ul class="nav nav-tabs" data-activable>
 				    <li class="active"><a href="#tab1">Tab1</a></li>
@@ -69,7 +97,7 @@
 			<div class="span6">
 				<ul class="accordion" data-activable="01">
 					<li class="accordion-group active">
-						<a class="accordion-heading"><span class="accordion-toggle">Collapsible Group Item #1</span></a>
+						<a class="accordion-heading" href="#"><span class="accordion-toggle">Collapsible Group Item #1</span></a>
 						<div class="accordion-body collapse">
 							<div class="accordion-inner">
 								Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid.
@@ -78,7 +106,7 @@
 						</div>
 					</li>
 					<li class="accordion-group">
-						<a class="accordion-heading"><span class="accordion-toggle">Collapsible Group Item #2</span></a>
+						<a class="accordion-heading" href="#"><span class="accordion-toggle">Collapsible Group Item #2</span></a>
 						<div class="accordion-body collapse">
 							<div class="accordion-inner">
 								Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid.
@@ -87,7 +115,7 @@
 						</div>
 					</li>
 					<li class="accordion-group">
-						<a class="accordion-heading"><span class="accordion-toggle">Collapsible Group Item #3</span></a>
+						<a class="accordion-heading" href="#"><span class="accordion-toggle">Collapsible Group Item #3</span></a>
 						<div class="accordion-body collapse">
 							<div class="accordion-inner">
 								Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid.
@@ -122,6 +150,16 @@
 		        </div>
 
 		        <div class="inline-children">
+		            <ul class="btn-group" data-activable="T">
+						<li class="btn btn-primary">Left
+						<li class="btn btn-primary">Middle
+						<li class="btn btn-primary">Right
+		            </ul>
+
+		            <p>0 or 1 temporarily active button</p>
+				</div>
+
+		        <div class="inline-children">
 		            <ul class="btn-group" data-activable="1">
 						<li class="btn btn-primary active">Left
 						<li class="btn btn-primary">Middle
@@ -130,6 +168,7 @@
 
 		            <p>Always 1 active button</p>
 				</div>
+				
 			</div>
 
 			<div class="span6">
@@ -253,31 +292,6 @@
 			</div>
 		</div>
 
-			<!-- This works great, but shouldn't be part of this demo
-			<div class="span4 navbar navbar-static"><div class="navbar-inner">
-				<ul class="nav activable">
-                  <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Drop 1<b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                      <li><a href="#">Action</a></li>
-                      <li><a href="#">Another action</a></li>
-                      <li><a href="#">Something else here</a></li>
-                      <li class="divider"></li>
-                      <li><a href="#">Separated link</a></li>
-                    </ul>
-                  </li>
-                  <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Drop 2 <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                      <li><a href="#">Action</a></li>
-                      <li><a href="#">Another action</a></li>
-                      <li><a href="#">Something else here</a></li>
-                      <li class="divider"></li>
-                      <li><a href="#">Separated link</a></li>
-                    </ul>
-                  </li>
-                </ul>
-			</div></div>-->
 	</div>
 	<div style="text-align: right;"><small>Photos ©<a href="http://dqmw.fr">Lorenzo Papace</a></small></div>
 </body>
