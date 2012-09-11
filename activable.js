@@ -14,9 +14,6 @@
 
 (function(window,document,Math,undefined) {
 
-// feature detection
-if ( !document.querySelector ) { return; }
-
 var isStandard = "addEventListener" in window,
 	_addEventListener = isStandard ? "addEventListener" : "attachEvent",
 	prefix = isStandard ? "" : "on",
@@ -24,6 +21,7 @@ var isStandard = "addEventListener" in window,
 	activateHandlers = {},
 	deactivateHandlers = {},
 	rauto = /(?:^| )auto(\w*)-onactivate(?: |$)/,
+	rnth = /:#(\d*)/g,
 	_ransition = "ransition",
 	html = document.documentElement,
 	prfx,
@@ -54,7 +52,7 @@ transition && document[ _addEventListener ]( transitionend, transitionendHandler
 document[ _addEventListener ]( prefix + "click", activeHandler, false );
 
 function Activable( elem ) {
-	this[0] = typeof elem == "string" ? document.querySelector( elem ) : elem;
+	this[0] = typeof elem == "string" ? exa( document, elem )[0] : elem;
 }
 
 // Activable API
@@ -115,119 +113,119 @@ function activeHandler( event ) {
 	!event && ( event = window.event );
 	var target = event.target || event.srcElement,
 		descendants = [target],
-		isActivable,
+		dataActivable,
+		dataDelegate,
+		dataTrigger,
 		delegater,
-		activationAnchor,
+		trigger,
 		internalTarget,
-		group,
-		children, i,
 		previouslyActive,
-		previousInternalTarget,
 		isActive,
-		verb;
+		verb,
+		ok;
 
 	// search for an activable parent
 	while (
 		target &&
 		target.ownerDocument &&
-		( isActivable = target.getAttribute("data-activable") ) == undefined 
+		( dataActivable = target.getAttribute("data-activable") ) == undefined 
 	) {
 		descendants.unshift( target = target.parentNode );
 	}
 
 	// make sure we've found an activable target
-	if ( isActivable != undefined ) {
+	if ( dataActivable != undefined ) {
 
 		// default behavior is "1 and always 1 is active"
-		if ( isActivable == "" ) {
-			isActivable = "1"
+		if ( dataActivable == "" ) {
+			dataActivable = "1"
 		}
+
+		dataDelegate = target.getAttribute("data-delegate");
+		dataTrigger = target.getAttribute("data-trigger");
 
 		// if the element is an ul, delegation is being used;
-		if ( target.nodeName == "UL" && descendants[1] ) {
+		if ( dataDelegate || dataDelegate != "" && target.nodeName == "UL" ) {
 			delegater = target;
-			target = descendants[1];
-			descendants.shift();
+
+			target = dataDelegate ?
+				queryList( descendants, dataDelegate ) :
+				descendants[1];
 		}
 
-		// search for an activation anchor
-		activationAnchor = findActivationAnchor( target );
-		isActive = c( target, "has", "active" );
+		// refresh the list of descendants
+		descendants.splice( 0, descendants.indexOf( target ) + 1 );
 
-		// if an activation anchor exists, ignore clicks occuring outside of it
-		// also ignore programatically triggered actions when they don't change the current state
-		if ( 
-			!( activationAnchor && event.type == "click" && activationAnchor != descendants[1] ) &&
-			!( ( isActive && event.type == "add" ) || ( !isActive && event.type == "remove" ) )
-		) {
+		// make sure we have a target and the trigger was clicked if it exists
+		if ( target && ( !dataTrigger || ( trigger = queryList( descendants, dataTrigger ) ) ) ) {
 
-			verb = ( event.type == "click" || event.type == "toggle" ?
-				( isActive ? "remove" : "add" ) :
-				event.type
-			);
+			isActive = c( target, "has", "active" );
 
-			// if the behavior is "O or 1 is active" or "1 and always 1 is active",
-			// deactivate the current active element
-			if ( isActivable == "01" || isActivable == "1" ) {
-				// if delegation is used, search for an active element with the same parent
-				if ( delegater ) {
-					previouslyActive = getChildren( delegater, ".active" )[0];
+			// also ignore programatically triggered actions when they don't change the current state
+			if ( ( isActive && event.type != "add" ) || ( !isActive && event.type != "remove" ) ) {
 
-				// search for an active element in the same group
-				} else if ( ( group = ( target ).getAttribute( "data-group" ) ) ) {
-					previouslyActive = document.querySelector( ".active[data-group=" + group + "]" );
+				verb = ( event.type == "click" || event.type == "toggle" ?
+					( isActive ? "remove" : "add" ) :
+					event.type
+				);
+
+				// if the behavior is "O or 1 is active" or "1 and always 1 is active",
+				// deactivate the current active element
+				if ( dataActivable == "01" || dataActivable == "1" ) {
+					// if delegation is used, search for an active element with the same parent
+					if ( delegater ) {
+						previouslyActive = queryList( exa( delegater, dataDelegate || ">li" ), ".active" );
+					}
+
+					// if "1 and always 1 is active", check the target is not the same as the previously active
+					if ( dataActivable == "1" && target == previouslyActive ) {
+						return preventDefault( event );
+					}
 				}
 
-				// if "1 and always 1 is active", check the target is not the same as the previously active
-				if ( isActivable == "1" && target == previouslyActive ) {
-					return preventDefault( event );
-				}
-
+				ok = +true;
 			}
-
-		// click occured outside of activation anchor
-		} else {
-			target = undefined;
 		}
-
-	// no activable parent found
-	} else {
-		target = undefined;
 	}
 
 	// deactivate the temporary element (make sure we don't deactivate it twice)
 	if ( temporary ) {
-		make( [ temporary, delegater, findActivationAnchor( temporary ) || temporary ], "remove", event );
+		make( [ temporary, delegater, ( dataTrigger && exa( temporary, dataTrigger )[0] ) || temporary ], "remove", event );
 	}
 
 	// if the behavior is "temporary", remember the currently active element
-	if ( isActivable == "T" ) {
+	if ( dataActivable == "T" ) {
 		temporary = target;
 	}
 
 	// deactivate the previously active element
 	if ( previouslyActive ) {
-		make( [ previouslyActive, delegater, findActivationAnchor( previouslyActive ) || previouslyActive ], "remove", event );
+		make( [ previouslyActive, delegater, ( dataTrigger &&  exa( previouslyActive, dataTrigger )[0] ) || previouslyActive ], "remove", event );
 	}
 
-	if ( target ) {
+	if ( ok ) {
 		// activate or deactivate the target and the internal target
-		make( [ target, delegater, activationAnchor || target ], verb, event );
+		make( [ target, delegater, trigger || target ], verb, event );
 	}
 
 	preventDefault( event );
 }
 
-function findActivationAnchor( elem, firstElemChild ) {
-	firstElemChild = getChildren( elem )[0];
+function queryList( nodeList, selector ) {
+	var i = nodeList.length;
 
-	return firstElemChild && firstElemChild.nodeName == "A" && firstElemChild;
+	// walk the list in reverse order, to find the deepest matching element
+	while ( i-- ) {
+		if( matches( nodeList[i], selector ) ) {
+			return nodeList[i];
+		}
+	}
 }
 
 function findInternalTarget( elem, internalTarget ) {
 	return ( internalTarget = elem.getAttribute( "href" ) ) &&
 		/^#./.test( internalTarget ) &&
-		document.querySelector( internalTarget );
+		exa( document, internalTarget )[0];
 }
 
 function preventDefault( event ) {
@@ -293,18 +291,8 @@ function make( targets, verb, event ) {
 	}
 }
 
-function getChildren( parent, selector ) {
-	var curId = parent.id,
-		tmpId = parent.id = "act" + ( Math.random() * 1E9 |0 ),
-		children = parent.parentNode.querySelectorAll( "#" + tmpId + ">" + ( selector || "*" ) );
-
-	parent.id = curId;
-
-	return children || [];
-}
-
 function seek( parent, rel, loop, index ) {
-	var children = getChildren( parent ),
+	var children = exa( parent, parent.getAttribute("data-delegate") || ">li" ),
 		length = children.length,
 		i = length,
 		prevActive,
@@ -407,5 +395,11 @@ function transitionendHandler( event ) {
 
 // c, an expressive className manipulation library
 function c(e,v,n,c,r){r=e[c='className'].replace(RegExp('(^| ) *'+n+' *( |$)','g'),'');return'has'==v?r!=e[c]:e[c]={add:1,toggle:r==e[c]}[v]?r+' '+n:r};
+
+// matches, check if an element matches a CSS selector | IE8 compatible
+function matches(a,d,b,c){for(b=exa(a.parentNode||document,d),c=0;d=b[c++];)if(d==a)return!0;return!1};
+
+// enhanced querySelecorAll, replace :#1 with :nth-of-type(1) and query only children when selector starts with ">..."
+function exa(a,b,c,d){b.indexOf(">")||(b=((c=a.parentNode)?"#"+(a.id||(a.id=d="a"+(1E6*Math.random()|0))):"html")+b);c=(c||a).querySelectorAll(b.replace(rnth,":nth-of-type($1)"));d&&(a.id="");return c};
 
 })(window,document,Math);

@@ -11,50 +11,6 @@
 
 module("standard features");
 
-
-
-test("data-activable=1 + data-group", function() {
-  var $target, $previous;
-
-  $target = $("#test3>li:eq(0)").Click();
-  ok( $target.hasClass( "active" ), "an element that wasn't `.active` becomes `.active` once clicked" );
-
-  $previous = $target;
-  $target = $("#test3>li:eq(1)").Click();
-  ok( $target.hasClass( "active" ), "another element that wasn't `.active` becomes `.active` once clicked..." );
-  ok( !$previous.hasClass( "active" ), "... and the previously `.active` element is no more `.active`" );
-
-  $target.Click();
-  ok( $target.hasClass( "active" ), "an element that was `.active` is still `.active` once clicked" );
-
-  $previous = $target;
-  $target = $("#test3>li:eq(2)");
-  $("#test3_item3").Click();
-  ok( $target.hasClass( "active" ), "another element that wasn't `.active` becomes `.active` once one of its children is clicked..." );
-  ok( !$previous.hasClass( "active" ), "... and the previously `.active` element is no more `.active`" );
-});
-
-test("data-activable=01 + data-group", function() {
-  var $target, $previous;
-
-  $target = $("#test2>li:eq(0)").Click();
-  ok( $target.hasClass( "active" ), "an element that wasn't `.active` becomes `.active` once clicked" );
-
-  $previous = $target;
-  $target = $("#test2>li:eq(1)").Click();
-  ok( $target.hasClass( "active" ), "another element that wasn't `.active` becomes `.active` once clicked..." );
-  ok( !$previous.hasClass( "active" ), "... and the previously `.active` element is no more `.active`" );
-
-  $previous = $target;
-  $target = $("#test2>li:eq(2)");
-  $("#test2_item3").Click();
-  ok( $target.hasClass( "active" ), "another element that wasn't `.active` becomes `.active` once one of its children is clicked..." );
-  ok( !$previous.hasClass( "active" ), "... and the previously `.active` element is no more `.active`" );
-
-  $target.Click();
-  ok( !$target.hasClass( "active" ), "an element that was `.active` is no more `.active` once clicked" );
-});
-
 test("data-activable=0X", function() {
   var $target;
 
@@ -193,20 +149,55 @@ test("data-activable=0X", function() {
   ok( !$target.hasClass( "active" ), "an element that was `.active` is no more `.active` once one of its children is clicked" );
 });
 
-module( "activation anchor" );
+module("Delegate")
 
-test("toggle active on click in activation anchor", function() {
+test("data-delegate=''", function() {
+  var $target;
+
+  $target = $("#test11>li:eq(0)").click();
+  ok( !$target.hasClass( "active" ), "a clicked list-item doesn't become active" );
+  ok( $target.parent().hasClass( "active" ), "the list itself becomes active" );
+
+  $target = $("#test11>li:eq(1)").click();
+  ok( !$target.hasClass( "active" ), "a clicked list-item doesn't become active" );
+  ok( !$target.parent().hasClass( "active" ), "the active list itself becomes inactive again" );
+});
+
+test("data-delegate='<selector>'", function() {
+  var $target, $previous;
+
+  $target = $("#test12>.cell:eq(0)").Click();
+  ok( $target.hasClass( "active" ), "an element that wasn't `.active` becomes `.active` once clicked" );
+
+  $previous = $target;
+  $target = $("#test12>.cell:eq(1)").Click();
+  ok( $target.hasClass( "active" ), "another element that wasn't `.active` becomes `.active` once clicked..." );
+  ok( !$previous.hasClass( "active" ), "... and the previously `.active` element is no more `.active`" );
+
+  $target.Click();
+  ok( $target.hasClass( "active" ), "an element that was `.active` is still `.active` once clicked" );
+
+  $previous = $target;
+  $target = $("#test12>.cell:eq(2)");
+  $("#test12_item3").Click();
+  ok( $target.hasClass( "active" ), "another element that wasn't `.active` becomes `.active` once one of its children is clicked..." );
+  ok( !$previous.hasClass( "active" ), "... and the previously `.active` element is no more `.active`" );
+});
+
+module( "Trigger" );
+
+test("data-trigger='a:#1'", function() {
   var $target;
 
   $target = $("#test4>li:eq(0)");
   $("#test4_item1").Click();
-  ok( $target.hasClass( "active" ), "clicking on the AA works" );
+  ok( $target.hasClass( "active" ), "clicking on the trigger works" );
 
   $target = $("#test4>li:eq(1)").Click();
   ok( !$target.hasClass( "active" ), "clicking directly on the activable doesn't work" );
 
   $("#test4_span2").Click();
-  ok( !$target.hasClass( "active" ), "clicking outside the AA doesn't work" );
+  ok( !$target.hasClass( "active" ), "clicking outside the trigger doesn't work" );
 
   $target = $("#test4>li:eq(2)");
   $("#test4_item3").Click();
@@ -214,11 +205,11 @@ test("toggle active on click in activation anchor", function() {
 
   $target = $("#test4>li:eq(3)");
   $("#test4_item4").Click();
-  ok( $target.hasClass( "active" ), "Clicking in AA descendants works" );
+  ok( $target.hasClass( "active" ), "Clicking in trigger descendants works" );
 
   $target = $("#test4>li:eq(4)");
   $("#test4_item5").Click();
-  ok( !$target.hasClass( "active" ), "Clicking in AA when the activable is already active works" );
+  ok( !$target.hasClass( "active" ), "Clicking in trigger when the activable is already active works" );
 });
 
 module( "internal target" );
@@ -228,9 +219,9 @@ test("toggle active on internal target", function() {
 
   $("#test5_item1").Click();
   $itarget = $("#exists");
-  ok( $itarget.hasClass( "active" ), "click on AA makes the internal target active" );
+  ok( $itarget.hasClass( "active" ), "click on trigger makes the internal target active" );
 
-  ok( $("#test5_item2").Click(), "click on AA with inexistant internal target doesn't throw" );
+  ok( $("#test5_item2").Click(), "click on trigger with inexistant internal target doesn't throw" );
 
   $("#test5_item3").Click();
   $itarget = $("#inactive");
@@ -336,6 +327,7 @@ test("clicks on `<body>` and `<html>` don't throw", function() {
 
 /* TOTEST;
  * - preventDefault
+ * - nested activable
  * - Event API
  */
 
@@ -395,18 +387,18 @@ jQuery.fn.Click = function() { return this.each(function(i,el) { fireClick(el); 
     <li data-activable=T><span><span><span id="test2b_item3">item3</span></span></span></li>
   </ul>
 
-	<ul id="test4">
-    <li data-activable=0X><!-- comment1 --><!-- comment2 --><a id="test4_item1">item1</a></li>
-    <li data-activable=0X><a>item2</a><span id="test4_span2">outside</span></li>
-    <li data-activable=0X><span><a id="test4_item3">item3</a></span></li>
-    <li data-activable=0X><a><span><span><span id="test4_item4">item4</span></span></span></a></li>
-    <li data-activable=0X class="active"><!-- comment --><a id="test4_item5">item5</a></li>
+	<ul id="test4" data-activable=0X data-trigger=">a:#1">
+    <li><!-- comment1 --><!-- comment2 --><a id="test4_item1">item1</a></li>
+    <li><a>item2</a><span id="test4_span2">outside</span></li>
+    <li><span><a id="test4_item3">item3</a></span></li>
+    <li><a><span><span><span id="test4_item4">item4</span></span></span></a></li>
+    <li class="active"><!-- comment --><a id="test4_item5">item5</a></li>
   </ul>
 
-  <ul id="test5">
-    <li data-activable=0X><!-- comment1 --><!-- comment2 --><a id="test5_item1" href="#exists">item1</a></li>
-    <li data-activable=0X><a id="test5_item2" href="#doesntexist">item2</a></li>
-    <li data-activable=0X class="active"><a id="test5_item3" href="#inactive">item3</a></li>
+  <ul id="test5" data-activable=0X data-trigger=">a:#1">
+    <li><!-- comment1 --><!-- comment2 --><a id="test5_item1" href="#exists">item1</a></li>
+    <li><a id="test5_item2" href="#doesntexist">item2</a></li>
+    <li class="active"><a id="test5_item3" href="#inactive">item3</a></li>
   </ul>
 
   <div id="exists"></div>
@@ -419,9 +411,9 @@ jQuery.fn.Click = function() { return this.each(function(i,el) { fireClick(el); 
     <li data-activable=0X class="active">item2</li>
   </ul>
 
-   <ul id="test7">
-    <li data-activable data-group="grp1">item1</li>
-    <li data-activable data-group="grp1" class="active">item2</li>
+   <ul id="test7" data-activable>
+    <li>item1</li>
+    <li class="active">item2</li>
   </ul>
 
   <ul id="test8">
@@ -465,6 +457,18 @@ jQuery.fn.Click = function() { return this.each(function(i,el) { fireClick(el); 
     <li id="test10_item2">item2
     <li id="test10_item3">item3
   </ul>
+
+  <ul id="test11" data-activable=0X data-delegate="">
+    <li>item1</li>
+    <li>item2</li>
+  </ul>
+
+  <div class="row" id="test12" data-activable data-delegate=".cell">
+    <div class="cell">item1</div>
+    <div class="cell">item2</div>
+    <div class="cell"><span><span><span id="test12_item3">item3</span></span></span></div>
+  </div>
+
  </div>
 </body>
 </html>
