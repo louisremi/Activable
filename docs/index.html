@@ -34,8 +34,8 @@
 						<a href="#declarative-conventions">Declarative conventions</a>
 						<ol class="nav nav-list">
 							<li><a href="#the-basics">The Basics</a></li>
-							<li><a href="#activable-lists">Activable Lists</a></li>
-							<li><a href="#activation-anchors">Activation Anchors</a></li>
+							<li><a href="#delegate">Delegation</a></li>
+							<li><a href="#triggers">Triggers</a></li>
 							<li><a href="#internal-relations">Internal Relations</a></li>
 						</ol>
 					</li>
@@ -63,18 +63,19 @@
 						<h3>The Basics</h3>
 
 						<p>
-							The conventional markup is composed of the <code>data-activable</code> and <code>data-group</code> attributes, as well as the <code>active</code> class:
+							An activable component is formed once an element is marked with the <code>data-activable</code> attribute.
+							Specific descendants of this element will be given the <code>active</code> class when clicked, with a behavior similar to radio or checkbox inputs. 
 						</p>
 
 						<ul>
-							<li><b><code>@data-activable</code></b> is used to indicate that an element should become <code>.active</code> when clicked. The value of this attribute indicates the exact behavior of the component:
+							<li><b><code>@data-activable</code></b> is used to make all <code>&lt;li&gt;</code>
+							children of an <code>&lt;ul&gt;</code> activable. The value of this attribute indicates the exact behavior of the component:
 								<ul>
-									<li><b><code>"1" </code></b> stands for "<b>1 and always 1 is active</b>" and means that when one element is <code>.active</code> the other elements of the same group lose this class (default value).
-									<li><b><code>"01"</code></b> stands for "<b>0 or 1 is active</b>" and has the same behavior as `"1"`, but the state of an element can be toggled.
-									<li><b><code>"T"</code></b> stands for "<b>0 or 1 is temporarily active</b>" and has the same behavior as `"01"`, but active elements are deactivated on the next click on the document.
-									<li><b><code>"0X"</code></b> stands for "<b>0 or X are active</b>" and means that state changes don't affect the elements of the same group.
+									<li><b><code>"1" </code></b> stands for "<b>1 and always 1 is active</b>" and means that when one item is <code>.active</code> the other items of the same list lose this class (default value).
+									<li><b><code>"01"</code></b> stands for "<b>0 or 1 is active</b>" and has the same behavior as `"1"`, but the currently active item can be desactivated.
+									<li><b><code>"T"</code></b> stands for "<b>0 or 1 is temporarily active</b>" and has the same behavior as `"01"`, but active items are desactivated on the next click on the document.
+									<li><b><code>"0X"</code></b> stands for "<b>0 or X are active</b>" and means that items are toggled without affecting other items of the same group.
 								</ul>
-							<li><b><code>@data-group</code></b> can be used to indicate which group (or component instance) this element is part of: every element sharing the same value for this attribute will be part of the same group.
 							<li><b><code>.active</code></b> should be targeted in CSS to render the elements of an activable components according to their state.
 						</ul>
 
@@ -82,24 +83,37 @@
 					</div>
 				</div>
 
-				<div id="activable-lists" class="row">
+				<div id="delegate" class="row">
 					<div class="span8">
-						<h3>Activable Lists</h3>
+						<h3>Delegation</h3>
 
 						<p>
-							To reduce the noise in the markup, activable lists can be used: all children items of an <b><code>&lt;ul&nbsp;data-activable&gt;</code></b> will be considered activable, in the same group, with the same behavior. The <code>&lt;ul&gt;</code> itself will not be activable. 
+							The principle of using <code>@data-activable</code> on an <code>&lt;ul&gt;</code> to make all of
+							its children items activable can be extended to any markup using a
+							<code>data-delegate="&lt;selector&gt;"</code> attribute.
+						</p>
+						<p>
+							To select activable elements amongst direct children of the element bearing this attribute,
+							prefix your selector with <code>&gt;</code>, example: <code>&gt;.cell</code> will turn all 
+							direct children of this element with the class <code>cell</code> into activable elements.
 						</p>
 
 						<iframe style="width: 100%; height: 280px;" src="http://jsfiddle.net/HVgva/4/embedded/html,result,css" frameborder="0"></iframe>
 					</div>
 				</div>
 
-				<div id="activation-anchors" class="row">
+				<div id="triggers" class="row">
 					<div class="span8">
-						<h3>Activation Anchors</h3>
+						<h3>Triggers</h3>
 
 						<p>
-							By default, clicking anywhere inside an activable element activates or toggles the active state of this element. The "click sensitive" area of an activable element can be restricted using activation anchors: if the first child of an activable element is an <b><code>&lt;a&gt;</code></b>, the element will change state only when this anchor is clicked.
+							It is possible to restrict the <i>click-sensitive</i> area of an activable element by
+							specifying a unique trigger using a <code>data-trigger="&lt;selector&gt;"</code> attribute.
+						</p>
+						<p>
+							To select the trigger amongst direct children of the activable element,
+							prefix your selector with <code>&gt;</code>,
+							example: <code>&gt;:first-child</code> will turn the very first child of activable elements into triggers.
 						</p>
 
 						<iframe style="width: 100%; height: 280px;" src="http://jsfiddle.net/XaXEB/4/embedded/html,result,css" frameborder="0"></iframe>
@@ -111,7 +125,7 @@
 						<h3>Internal Relations</h3>
 
 						<p>
-							Another common pattern is to have the state of an element be reflected on another one. This is the case of tab components: the labels are in an activable list and the content is in a different wrapper, but as a label is clicked, the label itself and the associated content become active. This relation can be expressed by an internal link if either the activable element is an anchor or if it has an <a href="#activation-anchors">activation anchor</a>.
+							A common pattern is to have the state of an element be reflected on another one (in a tab component, the labels are in an activable <code>&lt;ul&gt;</code> and the content is in a different wrapper, but clicking a label makes the appropriate content active). This relation can be expressed by an internal link if either the activable element is an anchor or if it defines an anchor as its <a href="#triggers">trigger</a>.
 						</p>
 
 						<iframe style="width: 100%; height: 300px;" src="http://jsfiddle.net/gNVft/7/embedded/html,result,css" frameborder="0"></iframe>

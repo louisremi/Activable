@@ -8,6 +8,10 @@ body {
 .page-header:first-of-type {
 	margin-bottom: 0;
 }
+.page-header:first-of-type h2 {
+	font-size: 22px;
+	line-height: 22px;
+}
 
 .active .accordion-body {
 	height: 110px;
@@ -15,7 +19,7 @@ body {
 
 #act-nav-bg {
 	position: absolute;
-	top: 104px;
+	top: 112px;
 	left: 0;
 	height: 96px;
 	width: 100%;
@@ -26,7 +30,6 @@ body {
 
 #act-nav {
 	padding: 30px 10px;
-	border-bottom: 1px solid #EEE;
 	margin: 0;
 	display: table;
 	width: 920px;
@@ -66,10 +69,6 @@ body {
 	display: inline-block;
 }
 
-.inline-children > ul {
-	margin: 0 0 -8px 0;
-}
-
 .tree-list li > a {
 	width: 250px;
 	line-height: 25px;
@@ -80,11 +79,16 @@ body {
 }
 
 #docs > nav {
+	font-size: 13px;
 	position: fixed;
 	background: white;
 	padding: 10px 0;
 	border: 1px solid #eee;
 	border-radius: 4px;
+}
+
+#docs > nav li {
+	line-height: 18px;
 }
 
 #docs > nav code {
