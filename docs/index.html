@@ -72,9 +72,10 @@
 							children of an <code>&lt;ul&gt;</code> activable. The value of this attribute indicates the exact behavior of the component:
 								<ul>
 									<li><b><code>"1" </code></b> stands for "<b>1 and always 1 is active</b>" and means that when one item is <code>.active</code> the other items of the same list lose this class (default value).
-									<li><b><code>"01"</code></b> stands for "<b>0 or 1 is active</b>" and has the same behavior as `"1"`, but the currently active item can be desactivated.
-									<li><b><code>"T"</code></b> stands for "<b>0 or 1 is temporarily active</b>" and has the same behavior as `"01"`, but active items are desactivated on the next click on the document.
+									<li><b><code>"01"</code></b> stands for "<b>0 or 1 is active</b>" and has the same behavior as `"1"`, but the currently active item can be deactivated.
 									<li><b><code>"0X"</code></b> stands for "<b>0 or X are active</b>" and means that items are toggled without affecting other items of the same group.
+									<li><b><code>"T"</code></b> stands for "<b>0 or 1 is temporarily active</b>" and has the same behavior as `"01"`, but active items are deactivated on the next click on the document.
+									
 								</ul>
 							<li><b><code>.active</code></b> should be targeted in CSS to render the elements of an activable components according to their state.
 						</ul>
