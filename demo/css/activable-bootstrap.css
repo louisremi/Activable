@@ -13,10 +13,10 @@
 	opacity: 0;
 	filter:alpha(opacity=0);
 	-webkit-transition: opacity 0.6s;
-       -moz-transition: opacity 0.6s;
-        -ms-transition: opacity 0.6s;
-         -o-transition: opacity 0.6s;
-            transition: opacity 0.6s;
+     -moz-transition: opacity 0.6s;
+      -ms-transition: opacity 0.6s;
+       -o-transition: opacity 0.6s;
+          transition: opacity 0.6s;
 }
 
 .tab-pane.active {
@@ -36,10 +36,10 @@
 
 .accordion-body {
 	-webkit-transition: height 0.3s;
-       -moz-transition: height 0.3s;
-        -ms-transition: height 0.3s;
-         -o-transition: height 0.3s;
-            transition: height 0.3s;
+     -moz-transition: height 0.3s;
+      -ms-transition: height 0.3s;
+       -o-transition: height 0.3s;
+          transition: height 0.3s;
 }
 
 .active .accordion-body {
@@ -79,10 +79,10 @@
 	overflow: hidden;
 
 	-webkit-transition: height .5s;
-	   -moz-transition: height .5s;
-		-ms-transition: height .5s;
-		 -o-transition: height .5s;
-			transition: height .5s;
+     -moz-transition: height .5s;
+      -ms-transition: height .5s;
+       -o-transition: height .5s;
+          transition: height .5s;
 }
 
 .tree-list ul {
@@ -114,9 +114,9 @@
 	/* currently the transition doesn't work in webkit :( */
 	-webkit-transition: -webkit-transform .5s;
 	   -moz-transition:    -moz-transform .5s;
-		-ms-transition:     -ms-transform .5s;
-		 -o-transition:      -o-transform .5s;
-			transition:         transform .5s;
+		  -ms-transition:     -ms-transform .5s;
+		   -o-transition:      -o-transform .5s;
+			    transition:         transform .5s;
 }
 
 .tree-list li.active > a:before {

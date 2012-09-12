@@ -8,7 +8,7 @@ Activable helps you build modern UI components quicker and keep your code clean.
 
 ```html
 <script src="activable.js"></script>
-<ul data-activable>
+<ul data-activable data-trigger=">:first-child">
   <li class="active"><a href="#t1">Tab1</a></li>
   <li class=""><a href="#t2">Tab2</a></li>
   <li class=""><a href="#t3">Tab3</a></li>
