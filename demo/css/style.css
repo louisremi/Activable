@@ -5,10 +5,10 @@ body {
 	background-image: url(http://subtlepatterns.com/patterns/groovepaper.png);
 }
 
-.page-header:first-of-type {
+.page-header {
 	margin-bottom: 0;
 }
-.page-header:first-of-type h2 {
+.page-header h2 {
 	font-size: 22px;
 	line-height: 22px;
 }

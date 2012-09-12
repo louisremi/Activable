@@ -21,7 +21,6 @@ var isStandard = "addEventListener" in window,
 	activateHandlers = {},
 	deactivateHandlers = {},
 	rauto = /(?:^| )auto(\w*)-onactivate(?: |$)/,
-	rnth = /:#(\d*)/g,
 	_ransition = "ransition",
 	html = document.documentElement,
 	prfx,
@@ -144,20 +143,24 @@ function activeHandler( event ) {
 		dataDelegate = target.getAttribute("data-delegate");
 		dataTrigger = target.getAttribute("data-trigger");
 
+		target = [ target, 0 ];
+
 		// if the element is an ul, delegation is being used;
-		if ( dataDelegate || dataDelegate != "" && target.nodeName == "UL" ) {
-			delegater = target;
+		if ( dataDelegate || dataDelegate != "" && target[0].nodeName == "UL" ) {
+			delegater = target[0];
 
 			target = dataDelegate ?
 				queryList( descendants, dataDelegate ) :
-				descendants[1];
+				[ descendants[1], 1 ];
 		}
 
 		// refresh the list of descendants
-		descendants.splice( 0, descendants.indexOf( target ) + 1 );
+		descendants.splice( 0, target[1] + 1 );
+
+		target = target[0];
 
 		// make sure we have a target and the trigger was clicked if it exists
-		if ( target && ( !dataTrigger || ( trigger = queryList( descendants, dataTrigger ) ) ) ) {
+		if ( target && ( !dataTrigger || ( trigger = queryList( descendants, dataTrigger )[0] ) ) ) {
 
 			isActive = c( target, "has", "active" );
 
@@ -174,7 +177,7 @@ function activeHandler( event ) {
 				if ( dataActivable == "01" || dataActivable == "1" ) {
 					// if delegation is used, search for an active element with the same parent
 					if ( delegater ) {
-						previouslyActive = queryList( exa( delegater, dataDelegate || ">li" ), ".active" );
+						previouslyActive = queryList( exa( delegater, dataDelegate || ">li" ), ".active" )[0];
 					}
 
 					// if "1 and always 1 is active", check the target is not the same as the previously active
@@ -217,9 +220,11 @@ function queryList( nodeList, selector ) {
 	// walk the list in reverse order, to find the deepest matching element
 	while ( i-- ) {
 		if( matches( nodeList[i], selector ) ) {
-			return nodeList[i];
+			return [ nodeList[i], i ];
 		}
 	}
+
+	return [];
 }
 
 function findInternalTarget( elem, internalTarget ) {
@@ -399,7 +404,7 @@ function c(e,v,n,c,r){r=e[c='className'].replace(RegExp('(^| ) *'+n+' *( |$)','g
 // matches, check if an element matches a CSS selector | IE8 compatible
 function matches(a,d,b,c){for(b=exa(a.parentNode||document,d),c=0;d=b[c++];)if(d==a)return!0;return!1};
 
-// enhanced querySelecorAll, replace :#1 with :nth-of-type(1) and query only children when selector starts with ">..."
-function exa(a,b,c,d){b.indexOf(">")||(b=((c=a.parentNode)?"#"+(a.id||(a.id=d="a"+(1E6*Math.random()|0))):"html")+b);c=(c||a).querySelectorAll(b.replace(rnth,":nth-of-type($1)"));d&&(a.id="");return c};
+// enhanced querySelecorAll, query only children when selector starts with ">..."
+function exa(a,b,c,d){b.indexOf(">")||(b=((c=a.parentNode)?"#"+(a.id||(a.id=d="a"+(1E6*Math.random()|0))):"html")+b);c=(c||a).querySelectorAll(b);d&&(a.id="");return c};
 
 })(window,document,Math);
