@@ -206,9 +206,9 @@ function activeHandler( event ) {
 	if ( ok ) {
 		// activate or deactivate the target and the internal target
 		make( [ target, delegater, trigger || target ], verb, event );
-	}
 
-	preventDefault( event );
+		preventDefault( event );
+	}
 }
 
 function queryList( nodeList, selector ) {
