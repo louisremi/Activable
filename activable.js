@@ -14,13 +14,12 @@
 
 (function(window,document,Math,undefined) {
 
-var isStandard = "addEventListener" in window,
+var activateHandlers = { type: "activate" },
+	deactivateHandlers = { type: "deactivate" },
+	temporary,
+	isStandard = "addEventListener" in window,
 	_addEventListener = isStandard ? "addEventListener" : "attachEvent",
 	prefix = isStandard ? "" : "on",
-	Activable,
-	activateHandlers = {},
-	deactivateHandlers = {},
-	rauto = /(?:^| )auto(\w*)-onactivate(?: |$)/,
 	_ransition = "ransition",
 	html = document.documentElement,
 	prfx,
@@ -34,8 +33,7 @@ var isStandard = "addEventListener" in window,
 		"t": "transitionend"
 	},
 	transition,
-	transitionend,
-	temporary;
+	transitionend;
 
 // transition feature detection
 for ( prfx in prefixes ) {
@@ -193,7 +191,10 @@ function activeHandler( event ) {
 
 	// deactivate the temporary element (make sure we don't deactivate it twice)
 	if ( temporary ) {
-		make( [ temporary, delegater, ( dataTrigger && exa( temporary, dataTrigger )[0] ) || temporary ], "remove", event );
+		make(
+			[ temporary, delegater, ( dataTrigger && exa( temporary, dataTrigger )[0] ) || temporary ],
+			"remove", "active", [ activateHandlers, deactivateHandlers ], event
+		);
 	}
 
 	// if the behavior is "temporary", remember the currently active element
@@ -203,12 +204,18 @@ function activeHandler( event ) {
 
 	// deactivate the previously active element
 	if ( previouslyActive ) {
-		make( [ previouslyActive, delegater, ( dataTrigger &&  exa( previouslyActive, dataTrigger )[0] ) || previouslyActive ], "remove", event );
+		make(
+			[ previouslyActive, delegater, ( dataTrigger &&  exa( previouslyActive, dataTrigger )[0] ) || previouslyActive ],
+			"remove", "active", [ activateHandlers, deactivateHandlers ], event
+		);
 	}
 
 	if ( ok ) {
 		// activate or deactivate the target and the internal target
-		make( [ target, delegater, trigger || target ], verb, event );
+		make(
+			[ target, delegater, trigger || target ],
+			verb, "active", [ activateHandlers, deactivateHandlers ], event
+		);
 
 		preventDefault( event );
 	}
@@ -259,34 +266,34 @@ function off( uuid, type, handler, allHandlers, match ) {
 	}
 }
 
-function make( targets, verb, event ) {
+function make( targets, verb, action, allHandlers, event ) {
 	var target = targets[0],
-		uuid, handlers, i, matches;
+		uuid, handlers, i, dataAuto;
 
 	targets[2] = findInternalTarget( targets[2] );
 
-	if ( transition && ( matches = rauto.exec( ( targets[1] || target ).className ) ) ) {
+	if ( transition && ( dataAuto = ( targets[1] || target ).getAttribute("data-auto") ) ) {
 		if ( targets[2] ) {
-			autoDim( targets[2], matches[1], verb );
+			autoDim( targets[2], dataAuto, verb, action );
 		}
-		autoDim( target, matches[1], verb );
+		autoDim( target, dataAuto, verb, action );
 
 	} else {
 		if ( targets[2] ) {
-			c( targets[2], verb, "active" );
+			c( targets[2], verb, action );
 		}
-		c( target, verb, "active" );
+		c( target, verb, action );
 	}
 
 	// bubble the event up in the tree
 	while ( target && target.ownerDocument ) {
 		if ( ( uuid = target.getAttribute( "data-aid" ) ) ) {
-			handlers = ( verb == "add" ? activateHandlers : deactivateHandlers )[ uuid ] || [];
+			handlers = allHandlers[ verb == "add" ? 0 : 1 ][ uuid ] || [];
 			i = handlers.length;
 
 			while ( i-- ) {
 				if ( !handlers[i].call( 
-					targets[0], event, verb == "add" ? "activate" : "deactivate", targets[2] 
+					targets[0], event, allHandlers[ verb == "add" ? 0 : 1 ].type, targets[2] 
 				) ) {
 					return;
 				}
@@ -356,13 +363,13 @@ function seek( parent, rel, loop, index ) {
 	activeHandler({ target: children[ index ], type: "add" });
 }
 
-function autoDim( elem, dimension, verb ) {
+function autoDim( elem, dimension, verb, action ) {
 	var from, to;
 
 	from = getComputedStyle( elem )[ dimension ];
 	// transitions should be temporarily disabled for Chrome
 	elem.style[ transition ] = "none";
-	c( elem, verb, "active" );
+	c( elem, verb, action );
 	// make sure the inline style is empty (not the case during a transition)
 	elem.style[ dimension ] = "";
 	to = getComputedStyle( elem )[ dimension ];
@@ -376,26 +383,40 @@ function autoDim( elem, dimension, verb ) {
 // remove inline style on transition end
 function transitionendHandler( event ) {
 	var target = event.target,
-		matches, child, lastTest;
+		dataAuto, dataDelegate;
 
-	while ( target && target != document && !( matches = rauto.exec( target.className ) ) && !lastTest ) {
-		child = target,
+	while (
+		target
+		&& target.ownerDocument
+		&& target.getAttribute("data-activable") == undefined
+	) {
 		target = target.parentNode;
-		lastTest = true;
 	}
 
-	if ( !matches || matches[1] != event.propertyName ) { return; }
+	// make sure we have an activable element with data-auto attr
+	if ( 
+		!target.ownerDocument
+		|| ( dataAuto = target.getAttribute("data-auto") ) != event.propertyName
+	) { 
+		return;
+	}
 
-	// delegation is being used
-	target.nodeName == "UL" && ( target = child );
+	// if delegation is being used, make sure the target is actually activable
+	if (
+		target.nodeName == "UL"
+		&& ( dataDelegate = target.getAttribute("data-delegate") ) != ""
+		&& !matches( event.target, ( dataDelegate || ">li" ) )
+	) { 
+		return;
+	}
 
 	// Chrome is having this bug again
-	target.style[ transition ] = "none";
+	event.target.style[ transition ] = "none";
 	// This line is enough to get the job done in Firefox
-	target.style[ matches[1] ] = "";
+	event.target.style[ dataAuto ] = "";
 	// the following 2 lines are part of workaround for Chrome as well
-	getComputedStyle( target )[ transition ];
-	target.style[ transition ] = "";
+	getComputedStyle( event.target )[ transition ];
+	event.target.style[ transition ] = "";
 }
 
 // c, an expressive className manipulation library
@@ -404,7 +425,7 @@ function c(e,v,n,c,r){r=e[c='className'].replace(RegExp('(^| ) *'+n+' *( |$)','g
 // matches, check if an element matches a CSS selector | IE8 compatible
 function matches(a,d,b,c){for(b=exa(a.parentNode||document,d),c=0;d=b[c++];)if(d==a)return!0;return!1};
 
-// enhanced querySelecorAll, query only children when selector starts with ">..."
+// enhanced querySelecorAll, understand queries starting with ">..."
 function exa(a,b,c,d){b.indexOf(">")||(b=((c=a.parentNode)?"#"+(a.id||(a.id=d="a"+(1E6*Math.random()|0))):"html")+b);c=(c||a).querySelectorAll(b);d&&(a.id="");return c};
 
 })(window,document,Math);
