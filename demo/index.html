@@ -8,6 +8,8 @@
 	<link rel="stylesheet" type="text/css" href="css/activable-bootstrap.css" />
 	<link rel="stylesheet" type="text/css" href="css/style.css" />
 	<script src="../activable.js"></script>
+	<script src="../hoverable.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.7.0/mustache.min.js"></script>
 </head>
 <body>
 	<div class="container" role="main">
@@ -292,7 +294,48 @@
 			</div>
 		</div>
 
+		<div class="row">
+			<div class="span6">
+				<p>
+					Tight pants next level keffiyeh <a title="Some tooltip" data-hoverable data-template="#tooltip" data-placement="top">you probably</a> haven't heard of them.
+					Photo booth beard raw denim letterpress vegan messenger bag stumptown.
+					Farm-to-table seitan, mcsweeney's fixie sustainable quinoa 8-bit
+					american apparel <a title="Another tooltip" data-hoverable data-template="#tooltip" data-placement="right">have a</a> terry richardson vinyl chambray.
+					Beard stumptown, cardigans banh mi lomo thundercats.
+					Tofu biodiesel williamsburg marfa, four loko mcsweeney's cleanse
+					vegan chambray.
+					A really ironic artisan <a title="Another one here too" data-hoverable data-template="#tooltip" data-placement="bottom">whatever keytar</a>, scenester farm-to-table
+					banksy Austin <a title="The last tip!" data-hoverable data-template="#tooltip" data-placement="left">twitter handle</a> freegan cred raw denim single-origin
+					coffee viral.
+				</p>
+			</div>
+
+			<div class="span6">
+			    <ul class="nav nav-pills" data-hoverable data-template="#popover" data-placement="bottom">
+					<li title="Popover #1: Some content"><a href="#">Home</a></li>
+					<li title="Another popover: And its content"><a href="#">Blog</a></li>
+					<li title="Final popover: Last content"><a href="#">Contact</a></li>
+				</ul>
+			</div>
+		</div>
+
 	</div>
 	<div style="text-align: right;"><small>Photos ©<a href="http://dqmw.fr">Lorenzo Papace</a></small></div>
+
+	<script type="text/template" id="tooltip">
+		<div class="tooltip fade in">
+			<div class="tooltip-arrow"></div>
+			<div class="tooltip-inner">{{title}}</div>
+		</div>
+	</script>
+	<script type="text/template" id="popover">
+		<div class="popover">
+			<div class="arrow"></div>
+			<h3 class="popover-title">{{header}}</h3>
+			<div class="popover-content">
+				<p>{{body}}</p>
+			</div>
+		</div>
+	</script>
 </body>
 </html>
