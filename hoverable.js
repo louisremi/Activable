@@ -77,7 +77,7 @@ Hoverable.prototype = {
 	off: function( type, handler ) {
 		var expando;
 
-		if ( ( expando = this[0].hovexpando ) ) {
+		if ( ( expando = this[0].hoverExpando ) ) {
 			if ( type == "enter" || type == "both" ) {
 				off( expando.enterHandlers, handler );
 			}

@@ -14,9 +14,7 @@
 
 (function(window,document,Math,undefined) {
 
-var activateHandlers = { type: "activate" },
-	deactivateHandlers = { type: "deactivate" },
-	temporary,
+var temporary,
 	isStandard = "addEventListener" in window,
 	_addEventListener = isStandard ? "addEventListener" : "attachEvent",
 	prefix = isStandard ? "" : "on",
@@ -28,7 +26,7 @@ var activateHandlers = { type: "activate" },
 		"MozT": "transitionend",
 		// transitions are unprefixed in IE10
 		//"msT": "msTransitionEnd",
-		// Opera has the strangest behavior
+		// Previous Opera had really strange behaviors
 		//"OT": "oTransitionEnd",
 		"t": "transitionend"
 	},
@@ -71,24 +69,28 @@ Activable.prototype = {
 	},
 
 	on: function( type, handler ) {
-		var uuid = this[0].getAttribute( "data-aid" );
-
-		if ( !uuid ) {
-			this[0].setAttribute( "data-aid", uuid = "act" + ( Math.random() * 1E9 |0 ) );
-		}
+		var expando = this[0].activeExpando || {};
 
 		if ( type == "activate" || type == "both" ) {
-			( activateHandlers[ uuid ] = activateHandlers[ uuid ] || [] ).push( handler );
+			( expando.activateHandlers || ( expando.activateHandlers = [] ) ).push( handler );
 		}
 		if ( type == "deactivate" || type == "both" ) {
-			( deactivateHandlers[ uuid ] = deactivateHandlers[ uuid ] || [] ).push( handler );
+			( expando.deactivateHandlers || ( expando.deactivateHandlers = [] ) ).push( handler );
 		}
+
+		this[0].hoverExpando = expando;
 	},
 	off: function( type, handler ) {
-		var uuid = this[0].getAttribute( "data-aid" );
+		var expando;
 
-		off( uuid, type, handler, activateHandlers, "activate" );
-		off( uuid, type, handler, deactivateHandlers, "deactivate" );
+		if ( ( expando = this[0].activeExpando ) ) {
+			if ( type == "activate" || type == "both" ) {
+				off( expando.activateHandlers, handler );
+			}
+			if ( type == "deactivate" || type == "both" ) {
+				off( expando.deactivateHandlers, handler );
+			}
+		}
 	},
 
 	toggle: function( activateHandler, deactivateHandler ) {
@@ -193,7 +195,7 @@ function activeHandler( event ) {
 	if ( temporary ) {
 		make(
 			[ temporary, delegater, ( dataTrigger && exa( temporary, dataTrigger )[0] ) || temporary ],
-			"remove", "active", [ activateHandlers, deactivateHandlers ], event
+			"remove", "deactivate", "active", event
 		);
 	}
 
@@ -206,7 +208,7 @@ function activeHandler( event ) {
 	if ( previouslyActive ) {
 		make(
 			[ previouslyActive, delegater, ( dataTrigger &&  exa( previouslyActive, dataTrigger )[0] ) || previouslyActive ],
-			"remove", "active", [ activateHandlers, deactivateHandlers ], event
+			"remove", "deactivate", "active", event
 		);
 	}
 
@@ -214,7 +216,7 @@ function activeHandler( event ) {
 		// activate or deactivate the target and the internal target
 		make(
 			[ target, delegater, trigger || target ],
-			verb, "active", [ activateHandlers, deactivateHandlers ], event
+			verb, verb == "add" ? "activate" : "deactivate", "active", event
 		);
 
 		preventDefault( event );
@@ -246,33 +248,31 @@ function preventDefault( event ) {
 		event.returnValue = false;
 }
 
-function off( uuid, type, handler, allHandlers, match ) {
-	var registeredHandlers, i;
-
-	if ( ( type == match || type == "both" ) && ( registeredHandlers = allHandlers[ uuid ] ) ) {
-		// remove one specific handler
-		if ( handler ) {
-			i = registeredHandlers.length;
-			while ( i-- ) {
-				if ( registeredHandlers[i] == handler ) {
-					registeredHandlers.splice( i, 1 );
-				}
+function off( handlers, handler ) {
+	if( handler ) {
+		i = handlers.length;
+		while ( i-- ) {
+			if ( handlers[i] == handler ) {
+				handlers.splice( i, 1 );
 			}
-
-		// remove all handlers of the given type
-		} else {
-			delete allHandlers[ uuid ];
 		}
+	} else {
+		handlers.length = 0;
 	}
 }
 
-function make( targets, verb, action, allHandlers, event ) {
+function make( targets, verb, type, action, event ) {
 	var target = targets[0],
-		uuid, handlers, i, dataAuto;
+		attributeHolder = targets[1] || target,
+		dataAuto, handlers;
 
 	targets[2] = findInternalTarget( targets[2] );
 
-	if ( transition && ( dataAuto = ( targets[1] || target ).getAttribute("data-auto") ) ) {
+	// content rendering
+	renderContent( target, attributeHolder, verb, action );
+
+	// change class names, after starting a transition if necessary
+	if ( transition && ( dataAuto = attributeHolder.getAttribute("data-auto") ) ) {
 		if ( targets[2] ) {
 			autoDim( targets[2], dataAuto, verb, action );
 		}
@@ -287,19 +287,99 @@ function make( targets, verb, action, allHandlers, event ) {
 
 	// bubble the event up in the tree
 	while ( target && target.ownerDocument ) {
-		if ( ( uuid = target.getAttribute( "data-aid" ) ) ) {
-			handlers = allHandlers[ verb == "add" ? 0 : 1 ][ uuid ] || [];
-			i = handlers.length;
+		handlers = ( target[ action + "Expando" ] || {} )[ type + "Handlers" ] || [];
+		i = handlers.length;
 
-			while ( i-- ) {
-				if ( !handlers[i].call( 
-					targets[0], event, allHandlers[ verb == "add" ? 0 : 1 ].type, targets[2] 
-				) ) {
-					return;
-				}
+		while ( i-- ) {
+			if ( !handlers[i].call( 
+				targets[0], event, type, targets[2] 
+			) ) {
+				return;
 			}
 		}
 		target = target.parentNode;
+	}
+}
+
+function renderContent( target, attributeHolder, verb, action ) {
+	var dataTemplate, dataContent, dataPlacement, title,
+		tmp, targetOffset,
+		rendered;
+
+	// We'll try to display a content
+	if ( ( verb == "add" ) && ( dataContent = target.getAttribute("data-content") || ( title = target.title ) ) ) {
+
+		dataPlacement = attributeHolder.getAttribute("data-placement") || "right";
+
+		// content is an internal link
+		if ( /^#/.test( dataContent ) ) {
+			rendered = exa( document, dataContent )[0];
+
+		// content is JSON and must be rendered
+		} else if ( ( window.Mustache || H ).render && ( dataTemplate = attributeHolder.getAttribute("data-template") ) ) {
+
+			// parse the content (create a simple {title:...} object if not jsonable)
+			try {
+				dataContent = JSON.parse( dataContent );
+			} catch (e) {
+				dataContent = {
+					title: dataContent
+				}
+				// if the title contains a ":", add "header" and "body" properties
+				if ( ( tmp = dataContent.title.split(":") ).length > 1 ) {
+					dataContent.header = tmp.shift();
+					dataContent.body = tmp.join(":");
+				}
+			}
+
+			// render the template
+			rendered = ( window.Mustache || H ).render( exa( document, dataTemplate )[0].innerHTML, dataContent );
+			tmp = document.createElement("div");
+			tmp.innerHTML = rendered;
+
+			// add a reference to the expando
+			( target[ action + "Expando" ] || ( target[ action + "Expando" ] = {} ) ).rendered =
+				rendered = exa( tmp, "*" )[0];
+
+			document.body.appendChild( rendered );
+			c( rendered, "add", dataPlacement );
+		}
+
+		// place the content
+		if ( rendered ) {
+			// remove target title
+			if ( title ) {
+				target.setAttribute( "data-content", title );
+				target.title = null;
+			}
+
+			rendered.style.position = "absolute";
+			rendered.style.display = "block";
+			rendered.style.opacity = 0;
+			targetOffset = getOffset( target );
+
+			if ( dataPlacement == "top" || dataPlacement == "bottom" ) {
+				// center the render content and the target on the same vertical axe
+				rendered.style.left = targetOffset.left + ( target.offsetWidth - rendered.offsetWidth )/2 + "px";
+
+				rendered.style.top = targetOffset.top +
+					( dataPlacement == "top" ? -rendered.offsetHeight : target.offsetHeight ) + "px";
+
+			// dataPlacement == "left" || dataPlacement == "right"
+			} else {
+				// center the render content and the target on the same horizontal axe
+				rendered.style.top = targetOffset.top + ( target.offsetHeight - rendered.offsetHeight )/2 + "px";
+
+				rendered.style.left = targetOffset.left +
+					( dataPlacement == "left" ? -rendered.offsetWidth : target.offsetWidth ) + "px";
+			}
+
+			rendered.style.opacity = "";
+		}
+
+	// We'll hide the rendered content
+	} else if ( rendered = ( target[ action + "Expando" ] || {} ).rendered ) {
+		document.body.removeChild( rendered );
 	}
 }
 
@@ -425,7 +505,10 @@ function c(e,v,n,c,r){r=e[c='className'].replace(RegExp('(^| ) *'+n+' *( |$)','g
 // matches, check if an element matches a CSS selector | IE8 compatible
 function matches(a,d,b,c){for(b=exa(a.parentNode||document,d),c=0;d=b[c++];)if(d==a)return!0;return!1};
 
-// enhanced querySelecorAll, understand queries starting with ">..."
+// enhanced querySelecorAll, understand queries starting with ">"
 function exa(a,b,c,d){b.indexOf(">")||(b=((c=a.parentNode)?"#"+(a.id||(a.id=d="a"+(1E6*Math.random()|0))):"html")+b);c=(c||a).querySelectorAll(b);d&&(a.id="");return c};
+
+// return offset of a given element
+function getOffset(e){var r=e.getBoundingClientRect(),b=document.body,d=document.documentElement;return{top:r.top+(window.pageYOffset||d.scrollTop)-(d.clientTop||b.clientTop||0),left:r.left+(window.pageXOffset||d.scrollLeft)-(d.clientLeft||b.clientLeft||0)}}
 
 })(window,document,Math);
