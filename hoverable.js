@@ -382,51 +382,27 @@ function autoDim( elem, dimension, type, action ) {
 
 // remove inline style on transition end
 function transitionendHandler( event ) {
-	var target = event.target,
-		dataAuto, dataDelegate;
+	var propertyName;
 
-	while (
-		target
-		&& target.ownerDocument
-		&& target.getAttribute("data-activable") == undefined
-	) {
-		target = target.parentNode;
+	if ( ( propertyName = event.target.getAttribute("data-auto") ) == event.propertyName ) {
+		// Chrome is having this bug again
+		event.target.style[ transition ] = "none";
+		// This line is enough to get the job done in Firefox
+		event.target.style[ propertyName ] = "";
+		// the following 2 lines are part of workaround for Chrome as well
+		getComputedStyle( event.target )[ transition ];
+		event.target.style[ transition ] = "";
 	}
-
-	// make sure we have an activable element with data-auto attr
-	if ( 
-		!target.ownerDocument
-		|| ( dataAuto = target.getAttribute("data-auto") ) != event.propertyName
-	) { 
-		return;
-	}
-
-	// if delegation is being used, make sure the target is actually activable
-	if (
-		target.nodeName == "UL"
-		&& ( dataDelegate = target.getAttribute("data-delegate") ) != ""
-		&& !matches( event.target, ( dataDelegate || ">li" ) )
-	) { 
-		return;
-	}
-
-	// Chrome is having this bug again
-	event.target.style[ transition ] = "none";
-	// This line is enough to get the job done in Firefox
-	event.target.style[ dataAuto ] = "";
-	// the following 2 lines are part of workaround for Chrome as well
-	getComputedStyle( event.target )[ transition ];
-	event.target.style[ transition ] = "";
 }
 
 // c, an expressive className manipulation library
-function c(e,v,n,c,r){r=e[c='className'].replace(RegExp('(^| ) *'+n+' *( |$)','g'),'');return'has'==v?r!=e[c]:e[c]={add:1,toggle:r==e[c]}[v]?r+' '+n:r};
+function c(e,v,n,c,r){r=e[c="className"].replace(RegExp(" *\\b"+n+"\\b","g"),"");return"has"==v?r!=e[c]:e[c]={add:1,toggle:r==e[c]}[v]?r+" "+n:r}
 
 // matches, check if an element matches a CSS selector | IE8 compatible
-function matches(a,d,b,c){for(b=exa(a.parentNode||document,d),c=0;d=b[c++];)if(d==a)return!0;return!1};
+function matches(a,d,b,c){for(b=exa(a.parentNode||document,d),c=0;d=b[c++];)if(d==a)return!0;return!1}
 
 // enhanced querySelecorAll, understand queries starting with ">"
-function exa(a,b,c,d){b.indexOf(">")||(b=((c=a.parentNode)?"#"+(a.id||(a.id=d="a"+(1E6*Math.random()|0))):"html")+b);c=(c||a).querySelectorAll(b);d&&(a.id="");return c};
+function exa(a,b,c,d){b.indexOf(">")||(b=((c=a.parentNode)?"#"+(a.id||(a.id=d="a"+(1E6*Math.random()|0))):"html")+b);c=(c||a).querySelectorAll(b);d&&(a.id="");return c}
 
 // return offset of a given element
 function getOffset(e){var r=e.getBoundingClientRect(),b=document.body,d=document.documentElement;return{top:r.top+(window.pageYOffset||d.scrollTop)-(d.clientTop||b.clientTop||0),left:r.left+(window.pageXOffset||d.scrollLeft)-(d.clientLeft||b.clientLeft||0)}}
